@@ -1,6 +1,6 @@
 # ⚡ Telegix
 
-> **Modern, lightweight, and ultra-fast Pure JavaScript Telegram Bot API framework for Node.js, Bun, Deno, and modern JavaScript runtimes.**
+> **lightweight Telegram Bot API framework for Node.js, Bun, Deno, and modern JavaScript runtimes.**
 
 [![npm version](https://img.shields.io/npm/v/telegix.svg?style=flat-square)](https://www.npmjs.com/package/telegix)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
@@ -1531,16 +1531,4 @@ bot.command('count', async (ctx) => {
 
 ---
 
-## 🧪 Running Tests
-
-Execute the automated test suite locally:
-
-```bash
-node test/test.js
-```
-
 ---
-
-## 📄 License
-
-MIT License © 2026 Michael Agam & Telegix Contributors.
