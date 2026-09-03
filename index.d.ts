@@ -92,6 +92,10 @@ export class Markup {
     text(text: string): object;
     callback(text: string, data: string): object;
     url(text: string, url: string): object;
+    primary(text: string, dataOrUrl?: string | number | object, options?: object): object;
+    danger(text: string, dataOrUrl?: string | number | object, options?: object): object;
+    success(text: string, dataOrUrl?: string | number | object, options?: object): object;
+    colored(text: string, style: 'primary' | 'danger' | 'success', dataOrUrl?: string | number | object, options?: object): object;
     webApp(text: string, url: string): object;
     contactRequest(text: string): object;
     locationRequest(text: string): object;
@@ -208,6 +212,14 @@ export class Context {
   replyWithPaidMedia(starCount: number, media: any[], extra?: object): Promise<Message>;
   replyWithSticker(sticker: any, extra?: object): Promise<Message>;
   replyWithGame(gameShortName: string, extra?: object): Promise<Message>;
+  replyWithLinkPreview(text: string, linkPreviewOptions: LinkPreview | object, extra?: object): Promise<Message>;
+  replyWithCollapsibleQuote(text: string, extra?: object): Promise<Message>;
+  replyWithExpandableQuote(text: string, extra?: object): Promise<Message>;
+  replyWithWebApp(text: string, webAppUrl: string, buttonText?: string, extra?: object): Promise<Message>;
+  streamText(textStream: any, options?: object): Promise<any>;
+  streamDraft(textStream: any, options?: object): Promise<any>;
+  savePreparedInlineMessage(result: object, options?: object): Promise<{ id: string; expiration_date: number }>;
+  validateWebAppInitData(initDataStr: string, options?: object): any;
   createForumTopic(name: string, extra?: object): Promise<any>;
   editForumTopic(messageThreadId?: number, extra?: object): Promise<boolean>;
   closeForumTopic(messageThreadId?: number): Promise<boolean>;
@@ -228,6 +240,7 @@ export class Context {
   sendRichMessageDraft(draft: any, extra?: object): Promise<boolean>;
   react(emoji: string | any[]): Promise<boolean>;
   answerCallbackQuery(text?: string, options?: object): Promise<boolean>;
+  answerCbQuery(text?: string, options?: object): Promise<boolean>;
   answerInlineQuery(results: any[], options?: object): Promise<boolean>;
   editMessageText(text: string, extra?: object): Promise<Message | boolean>;
   editMessageCaption(caption: string, extra?: object): Promise<Message | boolean>;
@@ -332,6 +345,7 @@ export class RichMessageBuilder {
   code(codeText: string, language?: string): this;
   quote(text: string, expandable?: boolean): this;
   expandableQuote(text: string): this;
+  collapsibleQuote(text: string): this;
   spoiler(text: string): this;
   link(text: string, url: string): this;
   mention(text: string, userId: number | string): this;
@@ -347,6 +361,10 @@ export class RichMessageBuilder {
   row(...buttons: object[]): this;
   callback(text: string, data: string): this;
   url(text: string, url: string): this;
+  primary(text: string, dataOrUrl?: string | number | object, options?: object): this;
+  danger(text: string, dataOrUrl?: string | number | object, options?: object): this;
+  success(text: string, dataOrUrl?: string | number | object, options?: object): this;
+  colored(text: string, style: 'primary' | 'danger' | 'success', dataOrUrl?: string | number | object, options?: object): this;
   disabled(text: string): this;
   webApp(text: string, webAppUrl: string): this;
   copyText(text: string, textToCopy: string): this;
@@ -402,6 +420,9 @@ export class Telegram {
   setManagedBotAccessSettings(userId: number, settings?: object, extra?: object): Promise<boolean>;
   getUserPersonalChatMessages(userId: number, extra?: object): Promise<any>;
   sendMessageDraft(chatId: number | string, text: string, extra?: object): Promise<boolean>;
+  savePreparedInlineMessage(userId: number, result: object, options?: object): Promise<{ id: string; expiration_date: number }>;
+  streamText(chatId: number | string, textStream: any, options?: object): Promise<{ message_id?: number; text: string; done: boolean }>;
+  streamDraft(chatId: number | string, textStream: any, options?: object): Promise<{ message_id?: number; text: string; done: boolean }>;
   setWebhook(url: string, extra?: object): Promise<boolean>;
   deleteWebhook(extra?: object): Promise<boolean>;
   getWebhookInfo(): Promise<any>;
@@ -481,7 +502,106 @@ export function paginateInlineQuery(ctx: Context, items: any[], formatterFn: (it
 
 export function albumMiddleware(options?: { windowMs?: number }): Middleware;
 
+export interface LinkPreviewOptions {
+  is_disabled?: boolean;
+  url?: string;
+  prefer_small_media?: boolean;
+  prefer_large_media?: boolean;
+  show_above_text?: boolean;
+}
+
+export class LinkPreview {
+  constructor(url?: string);
+  url(url: string): this;
+  disabled(disabled?: boolean): this;
+  disable(): this;
+  enable(): this;
+  smallMedia(small?: boolean): this;
+  largeMedia(large?: boolean): this;
+  aboveText(above?: boolean): this;
+  belowText(): this;
+  toJSON(): LinkPreviewOptions;
+  static create(url?: string): LinkPreview;
+  static disabled(): LinkPreview;
+  static small(url?: string): LinkPreview;
+  static large(url?: string): LinkPreview;
+  static above(url?: string): LinkPreview;
+}
+
+export function toTextStream(input: any): AsyncIterable<string>;
+export function streamText(
+  telegram: Telegram,
+  chatId: number | string,
+  textStream: any,
+  options?: {
+    intervalMs?: number;
+    minDeltaChars?: number;
+    useDraft?: boolean;
+    extra?: object;
+    draftId?: number;
+    initialMessage?: string;
+    onProgress?: (text: string, count: number) => void;
+    onError?: (err: Error) => void;
+  }
+): Promise<{ message_id?: number; text: string; done: boolean }>;
+
 export function validateWebAppInitData(initDataStr: string, botToken: string, options?: { maxAgeSeconds?: number }): any;
+export function parseWebAppInitData(initDataStr: string): any;
+export function createMiniAppLaunchUrl(botUsername: string, appShortName: string, startParam?: string): string;
+
+export class MiniAppLoadingScreen {
+  constructor(options?: {
+    title?: string;
+    icon?: string;
+    lightColor?: string;
+    darkColor?: string;
+    lightBg?: string;
+    darkBg?: string;
+    skeleton?: boolean;
+  });
+  setIcon(icon: string): this;
+  setTitle(title: string): this;
+  setColors(lightColor: string, darkColor: string): this;
+  setSkeleton(enabled?: boolean): this;
+  toCSS(): string;
+  toHTML(): string;
+}
+
+export function generateMiniAppLoadingScreen(options?: any): string;
+
+export const MiniApp: {
+  isInsideTelegram(): boolean;
+  webApp: any;
+  fullscreen: {
+    request(): boolean;
+    exit(): boolean;
+    isActive(): boolean;
+    onChange(callback: (isFullscreen: boolean) => void): void;
+    onFailed(callback: (err: any) => void): void;
+  };
+  motion: {
+    startAccelerometer(options?: { refresh_rate?: number }): boolean;
+    stopAccelerometer(): boolean;
+    onAccelerometer(callback: (data: { x: number; y: number; z: number }) => void): void;
+    startDeviceOrientation(options?: { refresh_rate?: number; need_absolute?: boolean }): boolean;
+    stopDeviceOrientation(): boolean;
+    onOrientation(callback: (data: { alpha: number; beta: number; gamma: number; absolute: boolean }) => void): void;
+    startGyroscope(options?: { refresh_rate?: number }): boolean;
+    stopGyroscope(): boolean;
+    onGyroscope(callback: (data: { x: number; y: number; z: number }) => void): void;
+  };
+  homeScreen: {
+    addToHomeScreen(): boolean;
+    checkStatus(callback: (status: 'unsupported' | 'unknown' | 'added' | 'missed') => void): void;
+  };
+  sharePreparedMessage(preparedMessageId: string): boolean;
+  downloadFile(params: { url: string; file_name: string }): boolean;
+  haptics: {
+    impact(style?: string): void;
+    notification(type?: string): void;
+    selection(): void;
+  };
+};
 
 export function promptMiddleware(): Middleware;
 

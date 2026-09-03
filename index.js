@@ -1,5 +1,5 @@
 /**
- * Telegix - Lightweight Telegram Bot API Framework
+ * Telegix - Lightweight, Pure JavaScript Telegram Bot API Framework
  * @author KazeDevID
  * @license MIT
  */
@@ -20,7 +20,16 @@ export { RateLimiter, rateLimit } from './lib/ratelimit.js';
 export { serializeMessage, serializeUpdate } from './lib/serialize.js';
 export { InlineQueryResultBuilder, paginateInlineQuery } from './lib/inline.js';
 export { albumMiddleware } from './lib/album.js';
-export { validateWebAppInitData } from './lib/webapp.js';
+export {
+  validateWebAppInitData,
+  parseWebAppInitData,
+  createMiniAppLaunchUrl,
+  MiniAppLoadingScreen,
+  generateMiniAppLoadingScreen,
+  MiniApp,
+} from './lib/webapp.js';
+export { streamText, toTextStream } from './lib/stream.js';
+export { LinkPreview } from './lib/link-preview.js';
 export { promptMiddleware } from './lib/prompt.js';
 export { escapeMarkdownV2, mdv2 } from './lib/markdownv2.js';
 export { inlineDebounceMiddleware } from './lib/inline-debounce.js';

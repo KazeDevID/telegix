@@ -51,7 +51,12 @@ Telegix is a high-performance, developer-friendly Telegram Bot API library built
   - [Custom Reply Keyboards](#custom-reply-keyboards)
   - [Inline Keyboards](#inline-keyboards)
   - [Complete Button Builder Reference](#complete-button-builder-reference)
+  - [🎨 Colored Buttons for Bots (Bot API 9.4+)](#-colored-buttons-for-bots-bot-api-94)
   - [Removing Keyboards & Force Reply](#removing-keyboards--force-reply)
+- [🌊 Streaming Text for Bots (`streamText` & `streamDraft`)](#-streaming-text-for-bots-streamtext--streamdraft)
+  - [Real-Time Message Edit Streaming](#real-time-message-edit-streaming)
+  - [Live Draft Streaming (Bot API 10.3+)](#live-draft-streaming-bot-api-103)
+  - [Streaming AI & LLM Responses (Gemini, OpenAI, Generators)](#streaming-ai--llm-responses-gemini-openai-generators)
 - [💬 Asynchronous Conversations & Wizard Scenes](#-asynchronous-conversations--wizard-scenes)
   - [Interactive Inline Prompts (`await ctx.prompt`)](#interactive-inline-prompts-await-ctxprompt)
   - [Multi-Step Wizard Scenes (`WizardScene` & `Stage`)](#multi-step-wizard-scenes-wizardscene--stage)
@@ -63,8 +68,15 @@ Telegix is a high-performance, developer-friendly Telegram Bot API library built
 - [✒️ Message Formatting (`fmt`, `html`, `mdv2`)](#️-message-formatting-fmt-html-mdv2)
   - [XSS-Safe HTML Builder (`fmt` & `html`)](#xss-safe-html-builder-fmt--html)
   - [MarkdownV2 Escaping Helpers (`mdv2`)](#markdownv2-escaping-helpers-mdv2)
+- [📜 Collapsible Quotes (`fmt`, `mdv2`, `RichMessage`)](#-collapsible-quotes-fmt-mdv2-richmessage)
+- [🔗 Adjustable Link Previews (`LinkPreview`)](#-adjustable-link-previews-linkpreview)
 - [💳 Payments, Invoices & Telegram Stars (`InvoiceBuilder`)](#-payments-invoices--telegram-stars-invoicebuilder)
-- [📱 Telegram Mini Apps / WebApps (`validateWebAppInitData`)](#-telegram-mini-apps--webapps-validatewebappinitdata)
+- [📱 Telegram Mini Apps Suite (`MiniApp` & Utilities)](#-telegram-mini-apps-suite-miniapp--utilities)
+  - [Mini App Authentication (`validateWebAppInitData`)](#mini-app-authentication-validatewebappinitdata)
+  - [Full-Screen Mode](#full-screen-mode)
+  - [Device Motion Tracking (Accelerometer, Orientation, Gyroscope)](#device-motion-tracking-accelerometer-orientation-gyroscope)
+  - [Custom Loading Screen Generator (`MiniAppLoadingScreen`)](#custom-loading-screen-generator-miniapploadingscreen)
+  - [Home Screen & Prepared Inline Messages](#home-screen--prepared-inline-messages)
 - [🤖 Multi-Bot Process Manager (`TelegixManager`)](#-multi-bot-process-manager-telegixmanager)
 - [⚡ Advanced Built-in Middlewares](#-advanced-built-in-middlewares)
   - [Rate Limiter Middleware (`rateLimit`)](#rate-limiter-middleware-ratelimit)
@@ -429,6 +441,32 @@ await ctx.reply('Choose an option:', {
     [Markup.button.callback('Option 1', 'opt_1')],
   ]),
 });
+
+// Stream real-time tokens/text with automated throttle control
+await ctx.streamText(tokenGenerator(), { initialMessage: '⏳ Thinking...' });
+
+// Stream real-time draft into chat input bar (Bot API 10.3)
+await ctx.streamDraft(tokenGenerator());
+
+// Reply with customized link preview (small/large, above/below, disabled)
+await ctx.replyWithLinkPreview('Visit Docs:', LinkPreview.large('https://telegix.dev'));
+
+// Reply with expandable/collapsible blockquote
+await ctx.replyWithCollapsibleQuote('Full debug stack trace...', '⚠️ <b>System Warning</b>');
+
+// Reply with button launching a Telegram Mini App
+await ctx.replyWithWebApp('Launch Dashboard:', 'https://app.example.com', '🚀 Open App');
+
+// Save a prepared inline message for Mini App sharing (Bot API 8.0+)
+const prepared = await ctx.savePreparedInlineMessage({
+  type: 'article',
+  id: 'share_1',
+  title: 'Share Score',
+  input_message_content: { message_text: 'I reached Level 10!' },
+});
+
+// Retrieve bot user identity
+const me = await ctx.getMe();
 ```
 
 ---
@@ -958,6 +996,10 @@ await ctx.reply('Interactive Post:', inline);
 | `Markup.button.text(text)` | Standard reply keyboard text button. |
 | `Markup.button.callback(text, data)` | Inline button triggering a callback query with `data`. |
 | `Markup.button.url(text, url)` | Inline button opening an external URL. |
+| `Markup.button.primary(text, dataOrUrl)` | **Primary (Blue)** styled button for prominent calls to action (**Bot API 9.4+**). |
+| `Markup.button.danger(text, dataOrUrl)` | **Danger (Red)** styled button for destructive actions (**Bot API 9.4+**). |
+| `Markup.button.success(text, dataOrUrl)` | **Success (Green)** styled button for positive confirmations (**Bot API 9.4+**). |
+| `Markup.button.colored(text, style, dataOrUrl)` | Custom styled button with `'primary' \| 'danger' \| 'success'` style. |
 | `Markup.button.webApp(text, url)` | Button launching a Telegram Mini App. |
 | `Markup.button.copyText(text, textToCopy)` | Inline button that copies `textToCopy` to the clipboard. |
 | `Markup.button.disabled(text)` | Disabled, non-clickable button (**Bot API 10.3**). |
@@ -975,6 +1017,50 @@ await ctx.reply('Interactive Post:', inline);
 
 ---
 
+### 🎨 Colored Buttons for Bots (Bot API 9.4+)
+
+Telegram Bot API 9.4 introduced native visual styling for inline buttons, allowing developers to emphasize specific actions with colors:
+
+- `primary`: Emphasized primary button (accent/blue styling)
+- `danger`: Destructive actions such as account deletion, bans, or cancelations (red styling)
+- `success`: Confirmations, approvals, and checkout completions (green styling)
+
+You can use colored buttons with callback queries or URLs via `Markup.button` or the `RichMessage` builder:
+
+```javascript
+import { Markup, RichMessage } from 'telegix';
+
+// 1. Using Markup.inlineKeyboard
+bot.command('confirm_delete', async (ctx) => {
+  const keyboard = Markup.inlineKeyboard([
+    [
+      Markup.button.danger('🗑️ Delete Account', 'action_confirm_delete'),
+      Markup.button.primary('Keep Account', 'action_cancel'),
+    ],
+    [
+      Markup.button.success('💳 Upgrade to Pro', 'https://example.com/checkout'),
+    ],
+  ]);
+
+  await ctx.reply('⚠️ Are you sure you want to delete your account permanently?', keyboard);
+});
+
+// 2. Using RichMessageBuilder
+bot.command('order_status', async (ctx) => {
+  const message = RichMessage.card('📦 Order #98124', 'Order ready for dispatch')
+    .header('Delivery Status', '🚚')
+    .badge('Status', 'Pending Signature')
+    .row(
+      Markup.button.success('✅ Approve & Sign', 'approve_98124'),
+      Markup.button.danger('❌ Reject Order', 'reject_98124')
+    );
+
+  await ctx.replyWithRichMessage(message);
+});
+```
+
+---
+
 ### Removing Keyboards & Force Reply
 
 ```javascript
@@ -983,6 +1069,102 @@ await ctx.reply('Keyboard removed.', Markup.removeKeyboard());
 
 // Force user to reply to this message
 await ctx.reply('Please enter your email address:', Markup.forceReply());
+```
+
+---
+
+## 🌊 Streaming Text for Bots (`streamText` & `streamDraft`)
+
+Real-time streaming is essential for modern AI-driven conversational bots (e.g. Gemini, OpenAI, Claude) and live progress updates. Telegix provides two powerful streaming modes:
+
+1. **Real-Time Message Edit Streaming**: Sends an initial placeholder message and progressively updates it with incoming chunks using an intelligent throttling buffer to safely prevent Telegram `429 Too Many Requests` errors.
+2. **Live Draft Streaming (Bot API 10.3+)**: Broadcasts ephemeral text chunks into the chat input bar via `sendMessageDraft` as typing occurs, then sends the finalized message once the stream completes.
+
+### Real-Time Message Edit Streaming
+
+```javascript
+import { Telegix, toTextStream } from 'telegix';
+
+const bot = new Telegix(process.env.BOT_TOKEN);
+
+// Custom token generator simulation
+async function* generateResponseTokens() {
+  const words = 'Telegix provides blazing fast, zero-dependency streaming for modern Telegram bots.'.split(' ');
+  for (const word of words) {
+    yield `${word} `;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+}
+
+bot.command('generate', async (ctx) => {
+  // Directly stream onto chat via ctx.streamText
+  const result = await ctx.streamText(generateResponseTokens(), {
+    initialMessage: '💭 Generating your answer...',
+    intervalMs: 800,     // Buffer updates to edit at most once every 800ms
+    minDeltaChars: 15,    // Only edit if at least 15 new characters arrived
+    parse_mode: 'HTML',
+  });
+
+  console.log(`Stream complete! Final message ID: ${result.message_id}`);
+});
+```
+
+### Live Draft Streaming (Bot API 10.3+)
+
+Live drafts display real-time streamed text directly in the chat preview or input box without producing edit notifications:
+
+```javascript
+bot.command('stream_draft', async (ctx) => {
+  async function* aiStream() {
+    yield 'Searching knowledge base...\n';
+    await new Promise((r) => setTimeout(r, 600));
+    yield 'Synthesizing response:\n';
+    await new Promise((r) => setTimeout(r, 600));
+    yield 'Everything is configured and running at optimal speeds!';
+  }
+
+  // Stream preview as draft, then send final message
+  await ctx.streamDraft(aiStream(), {
+    intervalMs: 600,
+    minDeltaChars: 10,
+  });
+});
+```
+
+### Streaming AI & LLM Responses (Gemini, OpenAI, Generators)
+
+Telegix automatically accepts any `AsyncIterable`, `ReadableStream`, Generator, Array, or String:
+
+```javascript
+import { GoogleGenAI } from '@google/genai';
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+bot.command('ask', async (ctx) => {
+  if (!ctx.payload) {
+    return ctx.reply('Please provide a prompt! Example: /ask Explain quantum computing');
+  }
+
+  // Create Gemini streaming response
+  const responseStream = await ai.models.generateContentStream({
+    model: 'gemini-2.5-flash',
+    contents: ctx.payload,
+  });
+
+  // Convert Gemini chunks to text stream
+  async function* extractText(stream) {
+    for await (const chunk of stream) {
+      if (chunk.text) yield chunk.text;
+    }
+  }
+
+  await ctx.streamText(extractText(responseStream), {
+    initialMessage: '🤖 Thinking...',
+    intervalMs: 800,
+    minDeltaChars: 20,
+    parse_mode: 'HTML',
+  });
+});
 ```
 
 ---
@@ -1225,6 +1407,110 @@ bot.command('md', async (ctx) => {
 
 ---
 
+## 📜 Collapsible Quotes (`fmt`, `mdv2`, `RichMessage`)
+
+Telegram supports expandable/collapsible blockquotes (`<blockquote expandable>`), allowing users to tuck away long logs, detailed terms of service, technical stack traces, or FAQ answers behind a clean toggle.
+
+Telegix provides first-class helpers across HTML, MarkdownV2, the `Context` object, and the `RichMessage` builder:
+
+### 1. HTML Formatting (`fmt.collapsibleQuote` / `html.expandableQuote`)
+
+```javascript
+import { fmt } from 'telegix';
+
+bot.command('faq', async (ctx) => {
+  const answer = fmt`
+<b>Frequently Asked Questions:</b>
+
+${fmt.collapsibleQuote('Here is a very long, comprehensive answer explaining step-by-step how to integrate Telegix with your custom backend infrastructure...')}
+  `;
+
+  await ctx.reply(answer, { parse_mode: 'HTML' });
+});
+```
+
+### 2. Context Shortcut (`ctx.replyWithCollapsibleQuote`)
+
+```javascript
+bot.command('terms', async (ctx) => {
+  await ctx.replyWithCollapsibleQuote(
+    '1. All user data is encrypted end-to-end.\n2. No telemetry is gathered without consent.\n3. Pure JavaScript runtime guarantees zero binary bloat.',
+    '📋 <b>Terms of Service</b> (Tap to expand):'
+  );
+});
+```
+
+### 3. MarkdownV2 Formatting (`mdv2.collapsibleQuote`)
+
+```javascript
+import { mdv2 } from 'telegix';
+
+bot.command('logs', async (ctx) => {
+  const hiddenLogs = mdv2.collapsibleQuote('Error: Connection timed out at line 42 in server.ts');
+  await ctx.reply(hiddenLogs, { parse_mode: 'MarkdownV2' });
+});
+```
+
+### 4. RichMessage Builder (`collapsibleQuote` / `expandableQuote`)
+
+```javascript
+import { RichMessage } from 'telegix';
+
+bot.command('patchnotes', async (ctx) => {
+  const card = RichMessage.card('⚡ Release v1.1.0', 'Modern Telegram Bot API updates')
+    .header('Changelog Details', '🚀')
+    .collapsibleQuote('• Added Streaming Text engine\n• Added Colored Buttons\n• Added Mini App Fullscreen & Motion\n• Added Adjustable Link Previews');
+
+  await ctx.replyWithRichMessage(card);
+});
+```
+
+---
+
+## 🔗 Adjustable Link Previews (`LinkPreview`)
+
+Telegram Bot API 7.0+ replaced the legacy `disable_web_page_preview` flag with the granular `link_preview_options` object. 
+
+Telegix provides the fluent `LinkPreview` builder to control whether media appears above or below text, display large image cards or compact thumbnails, or override preview URLs:
+
+```javascript
+import { LinkPreview } from 'telegix';
+
+// 1. Fluent Builder pattern
+bot.command('preview_custom', async (ctx) => {
+  const preview = LinkPreview.create('https://telegix.dev')
+    .largeMedia()      // Display large prominent card
+    .aboveText()       // Position preview above text
+    .toJSON();
+
+  await ctx.reply('Check out the official documentation:', {
+    link_preview_options: preview,
+  });
+});
+
+// 2. Direct Context Helper: ctx.replyWithLinkPreview
+bot.command('docs', async (ctx) => {
+  await ctx.replyWithLinkPreview(
+    'Explore the Telegix GitHub repository:',
+    LinkPreview.small('https://github.com/telegix/telegix', true) // Small thumbnail, above text
+  );
+});
+
+// 3. Static helper factories
+LinkPreview.disabled();              // Completely disables preview ({ is_disabled: true })
+LinkPreview.small('https://t.me');    // Shrinks media to small thumbnail
+LinkPreview.large('https://t.me');    // Expands media to large header card
+LinkPreview.above('https://t.me');    // Positions preview above message text
+LinkPreview.below('https://t.me');    // Positions preview below message text
+
+// 4. Automatic normalization in all sendMessage / editMessageText calls
+await bot.telegram.sendMessage(chatId, 'https://example.com', {
+  link_preview_options: LinkPreview.large('https://example.com'),
+});
+```
+
+---
+
 ## 💳 Payments, Invoices & Telegram Stars (`InvoiceBuilder`)
 
 Create and dispatch invoices for fiat currencies or **Telegram Stars (`XTR`)**:
@@ -1267,25 +1553,180 @@ bot.on('successful_payment', async (ctx) => {
 
 ---
 
-## 📱 Telegram Mini Apps / WebApps (`validateWebAppInitData`)
+## 📱 Telegram Mini Apps Suite (`MiniApp` & Utilities)
 
-Cryptographically verify Mini App authentication payloads using HMAC-SHA256:
+Telegix provides a complete end-to-end toolkit for Telegram Mini Apps (TMAs), encompassing both **backend cryptographic validation / message preparation** and **client-side WebApp SDK bridging** for modern features like full-screen mode, 3D device motion tracking, and theme-adaptive loading screens.
+
+### Mini App Authentication (`validateWebAppInitData`)
+
+Verify incoming Mini App authentication requests securely on your server using Telegram's HMAC-SHA256 signature protocol:
 
 ```javascript
 import { validateWebAppInitData, parseWebAppInitData } from 'telegix';
 
-// Inside your backend API route (e.g. Express / Fastify)
-app.post('/api/auth/validate', (req, res) => {
+// Express / Fastify / Node.js HTTP backend route:
+app.post('/api/tma/auth', (req, res) => {
   const { initData } = req.body;
-  const isValid = validateWebAppInitData(initData, process.env.BOT_TOKEN, 86400); // 24h expiration
+
+  // Cryptographically verifies hash with your bot token
+  const isValid = validateWebAppInitData(initData, process.env.BOT_TOKEN, {
+    maxAgeSeconds: 86400, // Reject if older than 24 hours
+  });
 
   if (!isValid) {
-    return res.status(401).json({ error: 'Invalid Telegram WebApp session' });
+    return res.status(401).json({ error: 'Unauthorized Mini App session' });
   }
 
-  const parsed = parseWebAppInitData(initData);
-  return res.json({ success: true, user: parsed.user });
+  // Parse user profile, auth_date, and query_id safely
+  const session = parseWebAppInitData(initData);
+  console.log(`Authenticated TMA User: ${session.user.first_name} (ID: ${session.user.id})`);
+
+  return res.json({ success: true, user: session.user });
 });
+```
+
+### Launching Mini Apps from the Bot
+
+```javascript
+import { createMiniAppLaunchUrl, Markup } from 'telegix';
+
+// 1. Generate Direct TMA Link
+const launchUrl = createMiniAppLaunchUrl('MyBot', 'shop', 'referrer_123');
+// -> https://t.me/MyBot/shop?startapp=referrer_123
+
+// 2. Reply to users with a WebApp button directly
+bot.command('app', async (ctx) => {
+  await ctx.replyWithWebApp(
+    'Welcome to our Mini App! Tap below to open:',
+    'https://my-app.example.com',
+    '🚀 Open WebApp'
+  );
+});
+```
+
+### Full-Screen Mode
+
+Telegram Mini Apps can expand to occupy the complete display height, hiding Telegram's top chrome:
+
+```javascript
+import { MiniApp } from 'telegix';
+
+// Inside your Mini App frontend (React, Vue, or Vanilla JS):
+if (MiniApp.isInsideTelegram()) {
+  // Request full screen
+  MiniApp.fullscreen.request();
+
+  // Listen for fullscreen state changes
+  MiniApp.fullscreen.onChange((isFullscreen) => {
+    console.log('Fullscreen active:', isFullscreen);
+  });
+
+  // Handle failure / unsupported versions
+  MiniApp.fullscreen.onFailed((err) => {
+    console.warn('Fullscreen could not be enabled:', err);
+  });
+
+  // Check current status
+  console.log('Is currently fullscreen:', MiniApp.fullscreen.isActive());
+}
+```
+
+### Device Motion Tracking (Accelerometer, Orientation, Gyroscope)
+
+Build immersive 3D games, VR experiences, or tilt-controlled interfaces directly within Telegram Mini Apps:
+
+```javascript
+import { MiniApp } from 'telegix';
+
+if (MiniApp.isInsideTelegram()) {
+  // 1. Accelerometer (Linear acceleration in m/s²)
+  MiniApp.motion.startAccelerometer({ refresh_rate: 20 });
+  MiniApp.motion.onAccelerometer(({ x, y, z }) => {
+    console.log(`Acceleration -> X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}, Z: ${z.toFixed(2)}`);
+  });
+
+  // 2. Device Orientation (Rotation in degrees)
+  MiniApp.motion.startDeviceOrientation({ need_absolute: true });
+  MiniApp.motion.onOrientation(({ alpha, beta, gamma, absolute }) => {
+    console.log(`Tilt -> Alpha: ${alpha}, Beta (Pitch): ${beta}, Gamma (Roll): ${gamma}`);
+  });
+
+  // 3. Gyroscope (Angular velocity in rad/s)
+  MiniApp.motion.startGyroscope();
+  MiniApp.motion.onGyroscope(({ x, y, z }) => {
+    console.log(`Gyro -> X: ${x}, Y: ${y}, Z: ${z}`);
+  });
+}
+```
+
+### Custom Loading Screen Generator (`MiniAppLoadingScreen`)
+
+Deliver a polished, native launch experience while your frontend bundles load with theme-adaptive styles:
+
+```javascript
+import { MiniAppLoadingScreen, generateMiniAppLoadingScreen } from 'telegix';
+
+// 1. Generate full HTML loading splash
+const loadingHtml = generateMiniAppLoadingScreen({
+  title: 'My Telegram WebApp',
+  icon: 'https://my-app.example.com/logo.png',
+  lightColor: '#2481cc',
+  darkColor: '#53a8ff',
+  skeleton: true, // Includes placeholder skeleton cards
+});
+
+// 2. Or configure using the fluent MiniAppLoadingScreen builder
+const screen = new MiniAppLoadingScreen({
+  title: 'Loading SuperApp...',
+  skeleton: true,
+})
+  .setColors('#007AFF', '#0A84FF')
+  .setIcon('https://example.com/app-icon.svg');
+
+// Output raw CSS or full HTML splash
+const splashCss = screen.toCSS();
+const splashHtml = screen.toHTML();
+```
+
+### Home Screen & Prepared Inline Messages
+
+Enable users to install your Mini App onto their phone's home screen and share dynamic game achievements directly into Telegram chats:
+
+```javascript
+import { MiniApp } from 'telegix';
+
+// 1. Add to Home Screen (PWA shortcut)
+MiniApp.homeScreen.addToHomeScreen();
+MiniApp.homeScreen.checkStatus((status) => {
+  // 'unsupported' | 'unknown' | 'added' | 'missed'
+  console.log('Home screen status:', status);
+});
+
+// 2. Prepared Inline Messages (Bot API 8.0+)
+// In your bot backend:
+bot.command('share_score', async (ctx) => {
+  const prepared = await ctx.savePreparedInlineMessage({
+    type: 'article',
+    id: 'score_1',
+    title: '🏆 High Score: 1,450 pts!',
+    input_message_content: {
+      message_text: '🎮 I just scored <b>1,450 points</b> in SuperApp! Can you beat me?',
+      parse_mode: 'HTML',
+    },
+  });
+
+  // Send the prepared message ID to the Mini App frontend
+  await ctx.reply(`Prepared Message ID: ${prepared.id}`);
+});
+
+// In your Mini App frontend:
+// Triggers Telegram native chat selector to send the prepared message!
+MiniApp.sharePreparedMessage(preparedMessageId);
+
+// 3. Native File Downloads & Haptic Feedback
+MiniApp.downloadFile({ url: 'https://example.com/receipt.pdf', file_name: 'receipt.pdf' });
+MiniApp.haptics.impact('medium');
+MiniApp.haptics.notification('success');
 ```
 
 ---
@@ -1405,76 +1846,98 @@ bot.on('inline_query', async (ctx) => {
 
 The `Telegram` client exposes every official method of the Telegram Bot API:
 
+### Updates & Webhooks
+- `getUpdates(options?)` — Receive incoming updates using long polling.
+- `setWebhook(url, options?)` — Specify a URL and receive incoming updates via outgoing webhook.
+- `deleteWebhook(options?)` — Remove webhook integration.
+- `getWebhookInfo()` — Get current webhook status.
+
 ### Account & Identity
-- `getMe()` — Retrieve bot identity information.
+- `getMe()` — Retrieve bot identity information (ID, username, can join groups, etc.).
 - `logOut()` / `close()` — Log out from the cloud Bot API or close the local bot instance.
-- `getMyName(extra)` / `setMyName(name, extra)` — Get or set bot name.
-- `getMyDescription(extra)` / `setMyDescription(description, extra)` — Get or set bot description.
-- `getMyShortDescription(extra)` / `setMyShortDescription(shortDescription, extra)` — Get or set short description.
-- `getMyCommands(extra)` / `setMyCommands(commands, extra)` / `deleteMyCommands(extra)` — Manage bot command menu list.
-- `getMyDefaultAdministratorRights(extra)` / `setMyDefaultAdministratorRights(rights, extra)` — Manage administrator rights.
-- `getChatMenuButton(extra)` / `setChatMenuButton(extra)` — Manage the chat menu button.
+- `getMyName(extra?)` / `setMyName(name, extra?)` — Get or set bot name.
+- `getMyDescription(extra?)` / `setMyDescription(description, extra?)` — Get or set bot description.
+- `getMyShortDescription(extra?)` / `setMyShortDescription(shortDescription, extra?)` — Get or set short description.
+- `getMyCommands(extra?)` / `setMyCommands(commands, extra?)` / `deleteMyCommands(extra?)` — Manage bot command menu list.
+- `getMyDefaultAdministratorRights(extra?)` / `setMyDefaultAdministratorRights(rights, extra?)` — Manage administrator rights.
+- `getChatMenuButton(extra?)` / `setChatMenuButton(extra?)` — Manage the chat menu button.
 
 ### Messages & Media Sending
-- `sendMessage(chatId, text, extra)`
-- `forwardMessage(chatId, fromChatId, messageId, extra)` / `forwardMessages(chatId, fromChatId, messageIds, extra)`
-- `copyMessage(chatId, fromChatId, messageId, extra)` / `copyMessages(chatId, fromChatId, messageIds, extra)`
-- `sendPhoto(chatId, photo, extra)`
-- `sendAudio(chatId, audio, extra)`
-- `sendDocument(chatId, document, extra)`
-- `sendVideo(chatId, video, extra)`
-- `sendAnimation(chatId, animation, extra)`
-- `sendVoice(chatId, voice, extra)`
-- `sendVideoNote(chatId, videoNote, extra)`
-- `sendPaidMedia(chatId, starCount, media, extra)`
-- `sendMediaGroup(chatId, media, extra)`
-- `sendLocation(chatId, latitude, longitude, extra)`
-- `sendVenue(chatId, latitude, longitude, title, address, extra)`
-- `sendContact(chatId, phoneNumber, firstName, extra)`
-- `sendPoll(chatId, question, options, extra)`
-- `sendDice(chatId, extra)`
-- `sendChatAction(chatId, action, extra)`
-- `setMessageReaction(chatId, messageId, reaction, extra)`
-- `sendSticker(chatId, sticker, extra)`
-- `sendGame(chatId, gameShortName, extra)`
-- `sendInvoice(chatId, title, description, payload, currency, prices, extra)`
-- `sendGift(userId, giftId, extra)`
-- `sendEphemeralMessage(chatId, text, ephemeralParameters, extra)`
-- `sendMessageDraft(chatId, text, extra)`
-- `sendRichMessage(chatId, richMessage, extra)`
-- `sendRichMessageDraft(chatId, draft, extra)`
+- `sendMessage(chatId, text, extra?)`
+- `forwardMessage(chatId, fromChatId, messageId, extra?)` / `forwardMessages(chatId, fromChatId, messageIds, extra?)`
+- `copyMessage(chatId, fromChatId, messageId, extra?)` / `copyMessages(chatId, fromChatId, messageIds, extra?)`
+- `sendPhoto(chatId, photo, extra?)`
+- `sendAudio(chatId, audio, extra?)`
+- `sendDocument(chatId, document, extra?)`
+- `sendVideo(chatId, video, extra?)`
+- `sendAnimation(chatId, animation, extra?)`
+- `sendVoice(chatId, voice, extra?)`
+- `sendVideoNote(chatId, videoNote, extra?)`
+- `sendPaidMedia(chatId, starCount, media, extra?)`
+- `sendMediaGroup(chatId, media, extra?)`
+- `sendLocation(chatId, latitude, longitude, extra?)`
+- `sendVenue(chatId, latitude, longitude, title, address, extra?)`
+- `sendContact(chatId, phoneNumber, firstName, extra?)`
+- `sendPoll(chatId, question, options, extra?)`
+- `sendDice(chatId, extra?)`
+- `sendChatAction(chatId, action, extra?)`
+- `setMessageReaction(chatId, messageId, reaction, extra?)`
+- `sendSticker(chatId, sticker, extra?)`
+- `sendGame(chatId, gameShortName, extra?)`
+- `sendInvoice(chatId, title, description, payload, currency, prices, extra?)`
+- `sendGift(userId, giftId, extra?)`
+- `sendEphemeralMessage(chatId, text, ephemeralParameters, extra?)`
+- `sendMessageDraft(chatId, text, extra?)`
+- `sendRichMessage(chatId, richMessage, extra?)`
+- `sendRichMessageDraft(chatId, draft, extra?)`
+
+### Streaming & Real-Time Engines
+- `streamText(chatId, textStream, options?)` — Stream real-time tokens with adaptive edit throttling.
+- `streamDraft(chatId, textStream, options?)` — Stream real-time message drafts into chat preview.
 
 ### Messages Editing & Deletion
-- `editMessageText(chatId, messageId, inlineMessageId, text, extra)`
-- `editMessageCaption(chatId, messageId, inlineMessageId, caption, extra)`
-- `editMessageMedia(chatId, messageId, inlineMessageId, media, extra)`
-- `editMessageReplyMarkup(chatId, messageId, inlineMessageId, replyMarkup, extra)`
-- `editRichMessageText(chatId, messageId, richMessage, extra)`
-- `editRichMessageCaption(chatId, messageId, caption, extra)`
+- `editMessageText(chatId, messageId, inlineMessageId, text, extra?)`
+- `editMessageCaption(chatId, messageId, inlineMessageId, caption, extra?)`
+- `editMessageMedia(chatId, messageId, inlineMessageId, media, extra?)`
+- `editMessageReplyMarkup(chatId, messageId, inlineMessageId, replyMarkup, extra?)`
+- `editRichMessageText(chatId, messageId, richMessage, extra?)`
+- `editRichMessageCaption(chatId, messageId, caption, extra?)`
 - `deleteMessage(chatId, messageId)`
 - `deleteMessages(chatId, messageIds)`
-- `editMessageLiveLocation(latitude, longitude, extra)` / `stopMessageLiveLocation(extra)`
-- `stopPoll(chatId, messageId, extra)`
+- `editMessageLiveLocation(latitude, longitude, extra?)` / `stopMessageLiveLocation(extra?)`
+- `stopPoll(chatId, messageId, extra?)`
+
+### Inline Mode & Mini Apps
+- `answerInlineQuery(inlineQueryId, results, extra?)`
+- `answerWebAppQuery(webAppQueryId, result)`
+- `savePreparedInlineMessage(userId, result, extra?)` — Save prepared inline message for Mini App sharing (**Bot API 8.0+**).
+
+### Payments & Telegram Stars
+- `createInvoiceLink(title, description, payload, currency, prices, extra?)`
+- `answerShippingQuery(shippingQueryId, ok, extra?)`
+- `answerPreCheckoutQuery(preCheckoutQueryId, ok, extra?)`
+- `refundStarPayment(userId, telegramPaymentChargeId, extra?)`
+- `getStarTransactions(extra?)`
 
 ### Chat Moderation & Administration
 - `getChat(chatId)`
 - `getChatAdministrators(chatId)`
 - `getChatMemberCount(chatId)` / `getChatMembersCount(chatId)`
 - `getChatMember(chatId, userId)`
-- `banChatMember(chatId, userId, extra)`
-- `unbanChatMember(chatId, userId, extra)`
-- `restrictChatMember(chatId, userId, permissions, extra)`
+- `banChatMember(chatId, userId, extra?)`
+- `unbanChatMember(chatId, userId, extra?)`
+- `restrictChatMember(chatId, userId, permissions, extra?)`
 - `promoteChatMember(chatId, userId, rights)`
 - `setChatAdministratorCustomTitle(chatId, userId, customTitle)`
-- `setChatPermissions(chatId, permissions, extra)`
+- `setChatPermissions(chatId, permissions, extra?)`
 - `setChatTitle(chatId, title)`
 - `setChatDescription(chatId, description)`
 - `setChatPhoto(chatId, photo)` / `deleteChatPhoto(chatId)`
-- `pinChatMessage(chatId, messageId, extra)` / `unpinChatMessage(chatId, messageId)` / `unpinAllChatMessages(chatId)`
+- `pinChatMessage(chatId, messageId, extra?)` / `unpinChatMessage(chatId, messageId)` / `unpinAllChatMessages(chatId)`
 - `leaveChat(chatId)`
 - `exportChatInviteLink(chatId)`
-- `createChatInviteLink(chatId, extra)`
-- `editChatInviteLink(chatId, inviteLink, extra)`
+- `createChatInviteLink(chatId, extra?)`
+- `editChatInviteLink(chatId, inviteLink, extra?)`
 - `revokeChatInviteLink(chatId, inviteLink)`
 - `approveChatJoinRequest(chatId, userId)`
 - `declineChatJoinRequest(chatId, userId)`
@@ -1485,9 +1948,22 @@ The `Telegram` client exposes every official method of the Telegram Bot API:
 - `getUserChatBoosts(chatId, userId)`
 - `getBusinessConnection(businessConnectionId)`
 
+### Stickers & Custom Emojis
+- `getStickerSet(name)`
+- `getCustomEmojiStickers(customEmojiIds)`
+- `uploadStickerFile(userId, sticker, stickerFormat)`
+- `createNewStickerSet(userId, name, title, stickers, extra?)`
+- `addStickerToSet(userId, name, sticker)`
+- `setStickerPositionInSet(sticker, position)`
+- `deleteStickerFromSet(sticker)`
+- `setStickerSetThumbnail(name, userId, thumbnail, format)`
+- `setCustomEmojiStickerSetThumbnail(name, customEmojiId)`
+- `setStickerSetTitle(name, title)`
+- `deleteStickerSet(name)`
+
 ### Forum Topics Management
-- `createForumTopic(chatId, name, extra)`
-- `editForumTopic(chatId, messageThreadId, extra)`
+- `createForumTopic(chatId, name, extra?)`
+- `editForumTopic(chatId, messageThreadId, extra?)`
 - `closeForumTopic(chatId, messageThreadId)`
 - `reopenForumTopic(chatId, messageThreadId)`
 - `deleteForumTopic(chatId, messageThreadId)`
@@ -1499,9 +1975,9 @@ The `Telegram` client exposes every official method of the Telegram Bot API:
 - `unhideGeneralForumTopic(chatId)`
 
 ### Managed Bot Access Settings (Bot API 10.3)
-- `getManagedBotAccessSettings(userId, extra)`
-- `setManagedBotAccessSettings(userId, settings, extra)`
-- `getUserPersonalChatMessages(userId, extra)`
+- `getManagedBotAccessSettings(userId, extra?)`
+- `setManagedBotAccessSettings(userId, settings, extra?)`
+- `getUserPersonalChatMessages(userId, extra?)`
 
 ---
 
