@@ -942,7 +942,7 @@ Modern Telegram bots frequently display dashboard and status metrics as **sleek 
 - 📐 **Vertical Column Divider Line** cleanly separating labels (left) and values (right)
 - ➖ **Horizontal Row Divider Lines** between every item
 - 🏷️ **Header Banner** with distinct background (`#1c2836`) and bold title
-- 🔵 **Telegram Blue Links** for handles (e.g. `@seventynn`) and protocol URLs
+- 🔵 **Telegram Blue Links** for handles (e.g. `@username`) and protocol URLs
 
 ```javascript
 import { Telegix, Table } from 'telegix';
@@ -1021,7 +1021,7 @@ await ctx.replyWithSystemStatus({
 await ctx.replyWithUserProfile({
   title: '👑 VIP MEMBERSHIP',
   subtitle: 'Tier 3 Account',
-  username: '@seventynn',
+  username: '@username',
   status: 'Verified Developer',
 });
 ```
@@ -1048,7 +1048,7 @@ Stack multiple cards (such as SYSTEM and PROFILE) in a single message or render 
 bot.command('dashboard', async (ctx) => {
   const sysCard = Table.systemStatus();
   const profileCard = Table.userProfile({
-    username: ctx.from?.username ? `@${ctx.from.username}` : '@seventynn',
+    username: ctx.from?.username ? `@${ctx.from.username}` : '@username',
   });
 
   // Sends both cards stacked together cleanly in chat
