@@ -1,6 +1,6 @@
 /**
  * Telegix - Lightweight, Pure JavaScript Telegram Bot API Framework
- * @author KazeDevID
+ * @author Michael Agam
  * @license MIT
  */
 
@@ -13,7 +13,71 @@ export { session, MemorySessionStore, FileSessionStore } from './lib/session.js'
 export { Polling } from './lib/polling.js';
 export { createWebhookCallback } from './lib/webhook.js';
 export { fmt, Format, escapeHtml, escapeMarkdown, html, markdown } from './lib/format.js';
-export { RichMessage, RichMessageBuilder } from './lib/rich.js';
+export { Table, InputRichBlockTable, RichBlockTable } from './lib/table.js';
+export { EphemeralMessageParameters, ReplyParameters, BotCommand } from './lib/ephemeral.js';
+export {
+  RichMessage,
+  RichMessageBuilder,
+  RichMessageButton,
+  RichTextButton,
+  InputRichMessage,
+  InputRichMessageMedia,
+  RichMessageMedia,
+  InputMediaVoiceNote,
+  MediaVoiceNote,
+  InputRichBlockButtons,
+  RichBlockButtons,
+  InputRichBlockExpandableBlockQuotation,
+  RichBlockExpandableBlockQuotation,
+  InputRichBlockDocument,
+  RichBlockDocument,
+  InputRichBlockParagraph,
+  RichBlockParagraph,
+  InputRichBlockSectionHeading,
+  RichBlockSectionHeading,
+  InputRichBlockPreformatted,
+  RichBlockPreformatted,
+  InputRichBlockFooter,
+  RichBlockFooter,
+  InputRichBlockDivider,
+  RichBlockDivider,
+  InputRichBlockMathematicalExpression,
+  RichBlockMathematicalExpression,
+  RichBlockMath,
+  InputRichBlockAnchor,
+  RichBlockAnchor,
+  InputRichBlockListItem,
+  RichBlockListItem,
+  InputRichBlockList,
+  RichBlockList,
+  InputRichBlockChecklist,
+  RichBlockChecklist,
+  InputRichBlockBlockQuotation,
+  RichBlockBlockQuotation,
+  InputRichBlockPullQuotation,
+  RichBlockPullQuotation,
+  RichBlockPullQuote,
+  InputRichBlockCollage,
+  RichBlockCollage,
+  InputRichBlockSlideshow,
+  RichBlockSlideshow,
+  InputRichBlockDetails,
+  RichBlockDetails,
+  InputRichBlockMap,
+  RichBlockMap,
+  InputRichBlockAnimation,
+  RichBlockAnimation,
+  InputRichBlockAudio,
+  RichBlockAudio,
+  InputRichBlockPhoto,
+  RichBlockPhoto,
+  InputRichBlockVideo,
+  RichBlockVideo,
+  InputRichBlockVoiceNote,
+  RichBlockVoiceNote,
+  InputRichBlockThinking,
+  RichBlockThinking,
+} from './lib/rich.js';
 export { Scene, BaseScene, WizardScene, Stage } from './lib/scenes.js';
 export { I18n } from './lib/i18n.js';
 export { RateLimiter, rateLimit } from './lib/ratelimit.js';

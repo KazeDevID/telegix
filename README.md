@@ -35,11 +35,28 @@ Telegix is a high-performance, developer-friendly Telegram Bot API library built
   - [Message Editing, Deleting, Forwarding, Copying, & Pinning](#message-editing-deleting-forwarding-copying--pinning)
   - [Chat Administration & Member Moderation](#chat-administration--member-moderation)
   - [Forum Supergroups & Topics Management](#forum-supergroups--topics-management)
-  - [Bot API 10.3 Methods (Rich Messages, Drafts, Ephemeral Messages, Managed Access)](#bot-api-103-methods-rich-messages-drafts-ephemeral-messages-managed-access)
+  - [Bot API 10.2 & 10.3 Methods (Live Photos, Rich Messages, Drafts, Ephemeral Messages, Managed Access)](#bot-api-102--103-methods-live-photos-rich-messages-drafts-ephemeral-messages-managed-access)
 - [🎨 Rich Message & Layout Builder Suite (`RichMessage`)](#-rich-message--layout-builder-suite-richmessage)
   - [Fluent Block Builder API](#fluent-block-builder-api)
+  - [Interactive Checklist Blocks (Bot API 10.2+)](#interactive-checklist-blocks-bot-api-102)
+  - [AI Thinking Indicator & Media Layouts (Collage, Slideshow)](#ai-thinking-indicator--media-layouts-collage-slideshow)
   - [Static Factory Methods](#static-factory-methods)
   - [Complete Interactive Rich Card Example](#complete-interactive-rich-card-example)
+- [📊 Table & Grid Formatting Suite (`Table` & `InputRichBlockTable`)](#-table--grid-formatting-suite-table--inputrichblocktable)
+  - [📱 Telegram Bot Card Tables (Rounded Card with Grid Dividers)](#-telegram-bot-card-tables-rounded-card-with-grid-dividers)
+  - [🤖 Pre-Configured & Fully Customizable System & User Profile Cards](#-pre-configured--fully-customizable-system--user-profile-cards)
+  - [💎 Multi-Card Stacking (`Table.multiCardSvg` & `ctx.replyWithCardTables`)](#-multi-card-stacking-tablemulticardsvg--ctxreplywithcardtables)
+  - [Monospaced Text Tables (Box, ASCII, Compact, Markdown)](#monospaced-text-tables-box-ascii-compact-markdown)
+  - [Direct Context Table Replies (`ctx.replyWithTable`)](#direct-context-table-replies-ctxreplywithtable)
+  - [Generating Tables from Objects (`Table.fromObjects`)](#generating-tables-from-objects-tablefromobjects)
+  - [Bot API 10.3 Native Rich Table Blocks](#bot-api-103-native-rich-table-blocks)
+- [📸 Live Photos Suite (Bot API 10.2+)](#-live-photos-suite-bot-api-102)
+- [↩️ Extended Reply Parameters & Ephemeral Commands (Bot API 10.2+)](#-extended-reply-parameters--ephemeral-commands-bot-api-102)
+- [🔵 Blue Text & Telegram Protocol Links (`tg://`, `documentLink`, `userLink`)](#-blue-text--telegram-protocol-links-tg-documentlink-userlink)
+  - [Blue Document Links (`tg://document?id=...`)](#blue-document-links-tgdocumentid)
+  - [Blue User Mention Links (`tg://user?id=...`)](#blue-user-mention-links-tguserid)
+  - [Blue Primary Buttons & Colored Buttons](#blue-primary-buttons--colored-buttons)
+- [⏱️ Ephemeral Messages & Auto-Disappearing Lifetimes (`EphemeralMessageParameters`)](#️-ephemeral-messages--auto-disappearing-lifetimes-ephemeralmessageparameters)
 - [🚦 Composer & Router Engine](#-composer--router-engine)
   - [Event Filtering (`bot.on`)](#event-filtering-boton)
   - [Slash Commands (`bot.command`)](#slash-commands-botcommand)
@@ -85,6 +102,7 @@ Telegix is a high-performance, developer-friendly Telegram Bot API library built
   - [Automatic Chat Action (`chatActionMiddleware`)](#automatic-chat-action-chatactionmiddleware)
   - [Inline Query Pagination (`paginateInlineQuery`)](#inline-query-pagination-paginateinlinequery)
 - [📚 Complete Telegram API Client Method Reference (`bot.telegram` / `bot.api`)](#-complete-telegram-api-client-method-reference-bottelegram--botapi)
+- [💡 Example Scripts & Demos](#-example-scripts--demos)
 - [🟦 TypeScript Support](#-typescript-support)
 - [🧪 Running Tests](#-running-tests)
 - [📄 License](#-license)
@@ -95,8 +113,10 @@ Telegix is a high-performance, developer-friendly Telegram Bot API library built
 
 - **Pure JavaScript & Zero Runtime Dependencies**: Built entirely on native Web standards (`fetch`, `FormData`, `Blob`) with zero binary compilation and zero third-party packages.
 - **Dual Module Architecture**: Full, native compatibility with modern **ESM (`import`)** and **CommonJS (`require`)**.
-- **Complete Telegram Bot API 10.3 Compliance**: Built-in support for message drafts (`sendMessageDraft`, `sendRichMessageDraft`), ephemeral messages (`sendEphemeralMessage`), managed bot access settings (`getManagedBotAccessSettings`, `setManagedBotAccessSettings`), disabled buttons (`Markup.button.disabled`), and Telegram Stars (`XTR`).
-- **Rich Message Builder Suite**: Fluent `RichMessage` API with structured blocks, headers, badges, quotes, code blocks, and automatic HTML fallback compilation.
+- **Complete Telegram Bot API 10.2 & 10.3 Compliance**: Built-in support for Live Photos (`sendLivePhoto`, `replyWithLivePhoto`), message drafts (`sendMessageDraft`, `sendRichMessageDraft`), ephemeral messages (`sendEphemeralMessage`), extended reply parameters (`checklist_task_id`, `poll_option_id`, `is_ephemeral`), ephemeral commands (`BotCommand.is_ephemeral`), managed bot access settings (`getManagedBotAccessSettings`), disabled buttons (`Markup.button.disabled`), and Telegram Stars (`XTR`).
+- **Rich Message Builder Suite**: Fluent `RichMessage` API with structured blocks, headers, badges, quotes, code blocks, interactive checklists (`.checklist()`), AI reasoning indicators (`.thinking()`), media layouts (`.collage()`, `.slideshow()`), and automatic HTML fallback compilation.
+- **Table & Card Formatting Engine**: Generate monospaced tables (`box`, `ascii`, `compact`, `markdown`), native Bot API 10.3 `InputRichBlockTable` blocks, and sleek Telegram Bot dark status cards with arbitrary dynamic fields (`ctx.replyWithSystemStatus`, `ctx.replyWithUserProfile`).
+- **Blue Text & Telegram Protocol Links**: Native helpers for `tg://document?id=...` and `tg://user?id=...` to display blue clickable links in chat without external web routing.
 - **Seamless Keyboard Normalization**: Pass `Markup.keyboard()` or `Markup.inlineKeyboard()` directly as the 2nd argument to `ctx.reply()` without manual JSON wrapping or extra payloads.
 - **Asynchronous Inline Prompts**: Await user answers step-by-step with `const answer = await ctx.prompt('What is your name?')`.
 - **Multi-Step Wizard Scenes**: Structured conversation flows with `WizardScene` and `Stage` for complex interactive state machines.
@@ -457,6 +477,12 @@ await ctx.replyWithCollapsibleQuote('Full debug stack trace...', '⚠️ <b>Syst
 // Reply with button launching a Telegram Mini App
 await ctx.replyWithWebApp('Launch Dashboard:', 'https://app.example.com', '🚀 Open App');
 
+// Reply with formatted monospaced table (Box, Compact, ASCII, Markdown)
+await ctx.replyWithTable(['Item', 'Price'], [['Pro Plan', '$29'], ['Addon', '$5']], { style: 'box' });
+
+// Reply with auto-disappearing ephemeral message (Bot API 10.3)
+await ctx.replyEphemeral('This message will disappear in 15 seconds.', 15);
+
 // Save a prepared inline message for Mini App sharing (Bot API 8.0+)
 const prepared = await ctx.savePreparedInlineMessage({
   type: 'article',
@@ -513,6 +539,13 @@ await ctx.replyWithMediaGroup([
   { type: 'photo', media: 'https://example.com/photo2.jpg' },
   { type: 'video', media: 'https://example.com/video1.mp4' },
 ]);
+
+// 9. Send Live Photo (Bot API 10.2+)
+await ctx.replyWithLivePhoto(
+  'https://example.com/cover.jpg',
+  'https://example.com/motion.mp4',
+  { caption: '📸 Dynamic Live Photo' }
+);
 ```
 
 ---
@@ -672,17 +705,28 @@ await ctx.unpinAllForumTopicMessages(ctx.topicId);
 
 ---
 
-### Bot API 10.3 Methods (Rich Messages, Drafts, Ephemeral Messages, Managed Access)
+### Bot API 10.2 & 10.3 Methods (Live Photos, Rich Messages, Drafts, Ephemeral Messages, Managed Access)
 
 ```javascript
-import { RichMessage, Markup } from 'telegix';
+import { RichMessage, Markup, ReplyParameters } from 'telegix';
 
-// 1. Send Rich Message (structured layout blocks with automatic fallback)
+// 1. Send Live Photo (Bot API 10.2+)
+await ctx.replyWithLivePhoto(
+  'https://example.com/photo.jpg',
+  'https://example.com/video.mp4',
+  { caption: '✨ Interactive Live Photo' }
+);
+
+// 2. Send Rich Message (structured layout blocks with automatic fallback)
 const card = RichMessage.card('⚡ Server Health Check', 'All systems operational.')
   .header('Cluster Status', '🟢')
   .badge('CPU Load', '14%')
   .badge('Memory', '1.2 GB / 8.0 GB')
-  .list(['Node 1: Online', 'Node 2: Online', 'Node 3: Standby'])
+  .checklist([
+    { text: 'Database connectivity', is_checked: true },
+    { text: 'Redis cache synchronization', is_checked: true },
+    { text: 'Worker nodes online', is_checked: false },
+  ])
   .expandableQuote('Rich messages provide structured block layouts.')
   .row(
     Markup.button.callback('🔄 Refresh', 'refresh_stats'),
@@ -691,23 +735,32 @@ const card = RichMessage.card('⚡ Server Health Check', 'All systems operationa
 
 await ctx.replyWithRichMessage(card);
 
-// 2. Edit existing message with Rich Message
+// 3. Edit existing message with Rich Message
 await ctx.editRichMessageText(card);
 
-// 3. Send Rich Message Draft
+// 4. Send Rich Message Draft
 await ctx.sendRichMessageDraft(card);
 
-// 4. Send Message Draft (Real-time draft displayed directly in user client)
+// 5. Send Message Draft (Real-time draft displayed directly in user client)
 await ctx.sendMessageDraft('Bot is currently preparing your report...');
 
-// 5. Send Ephemeral Message (Message with automated lifetime)
+// 6. Send Ephemeral Message (Message with automated lifetime)
 await ctx.sendEphemeralMessage('This message will automatically vanish in 15 seconds.', 15);
 
-// 6. Managed Bot Access Settings (Bot API 10.3)
+// 7. Extended ReplyParameters (Bot API 10.2+)
+await ctx.reply('Replying to specific checklist task:', {
+  reply_parameters: {
+    message_id: ctx.message?.message_id,
+    checklist_task_id: 2,
+    allow_sending_without_reply: true,
+  },
+});
+
+// 8. Managed Bot Access Settings (Bot API 10.3)
 const accessSettings = await ctx.getManagedBotAccessSettings(adminUserId);
 await ctx.setManagedBotAccessSettings({ allow_admin_override: true }, adminUserId);
 
-// 7. Get User Personal Chat Messages
+// 9. Get User Personal Chat Messages
 const messages = await ctx.getUserPersonalChatMessages(targetUserId);
 ```
 
@@ -733,8 +786,20 @@ The `RichMessage` class allows you to construct modern, structured card layouts,
 | `.mention(text, userId)` | Adds an inline mention link for a Telegram user ID. |
 | `.list(items, bullet?)` | Formats an array of strings into a bulleted list. |
 | `.numberedList(items)` | Formats an array of strings into a numbered list (1., 2., 3.). |
+| `.checklist(items, options?)` | Adds an interactive task checklist block with checkbox states (`is_checked: boolean`) (**Bot API 10.2+**). |
+| `.thinking(text)` | Adds an AI reasoning/thinking status indicator block. |
+| `.sectionHeading(text, level?)` | Adds a section heading block with semantic level 1-3. |
+| `.collage(photos, options?)` | Arranges multiple photos into a cohesive photo grid collage. |
+| `.slideshow(photos, options?)` | Arranges media into a sequential interactive slideshow. |
+| `.isRtl(boolean)` | Sets Right-to-Left script direction (Arabic, Hebrew, Persian). |
+| `.addMedia(media, options?)` / `.media(...)` | Attaches a media object (photo, video, audio) to the rich message. |
+| `.table(headers, rows, options?)` | Adds a structured table block (Bot API 10.3 Native Block or HTML pre-formatted fallback). |
+| `.compactTable(headers, rows, options?)` | Adds a compact table block with minimal padding for mobile. |
+| `.document(document, caption?, options?)` | Adds a rich document block attachment. |
+| `.documentLink(documentId, text?)` | Adds an inline blue document download link (`tg://document?id=...`). |
 | `.badge(label, value, icon?)` | Adds a key-value metric badge item. |
 | `.divider()` | Inserts a clean visual separator line. |
+| `.buttons(matrix)` | Appends a matrix of inline keyboard buttons as a block. |
 | `.row(...buttons)` | Appends a row of inline keyboard buttons. |
 | `.callback(text, data)` | Appends an inline callback query button. |
 | `.url(text, url)` | Appends an external URL link button. |
@@ -744,6 +809,55 @@ The `RichMessage` class allows you to construct modern, structured card layouts,
 | `.compile()` / `.build()` | Compiles all blocks into a Telegram-ready payload object. |
 | `.send(ctx)` | Sends the rich message using the active context. |
 | `.edit(ctx)` | Edits an existing message with this rich message. |
+
+### Interactive Checklist Blocks (Bot API 10.2+)
+
+Telegram Bot API 10.2 introduced interactive checklist blocks (`InputRichBlockChecklist`). Telegix provides first-class support for defining tasks with dynamic completion states:
+
+```javascript
+import { RichMessage, Markup } from 'telegix';
+
+bot.command('tasks', async (ctx) => {
+  const msg = RichMessage.create('📋 <b>Sprint Tasks</b>')
+    .sectionHeading('Milestone 1 Deliverables', 2)
+    .checklist([
+      { text: 'Complete Bot API 10.2 Live Photo integration', is_checked: true },
+      { text: 'Implement Checklist rich blocks', is_checked: true },
+      { text: 'Ship documentation and example suite', is_checked: false },
+    ])
+    .divider()
+    .row(
+      Markup.button.success('Mark All Done', 'tasks_complete_all'),
+      Markup.button.primary('Refresh', 'tasks_refresh')
+    );
+
+  await ctx.replyWithRichMessage(msg);
+});
+```
+
+### AI Thinking Indicator & Media Layouts (Collage, Slideshow)
+
+Modern AI assistants can indicate active reasoning and thinking stages before displaying output:
+
+```javascript
+bot.command('ai_diagnose', async (ctx) => {
+  const report = RichMessage.create('🤖 <b>System Diagnosis</b>')
+    .thinking('Analyzing latency metrics across distributed clusters...')
+    .sectionHeading('Cluster Health Evaluation', 2)
+    .badge('Status', 'Nominal', '🟢')
+    .badge('Load Average', '0.42', '⚡')
+    .collage([
+      'https://example.com/chart1.png',
+      'https://example.com/chart2.png',
+    ])
+    .slideshow([
+      'https://example.com/slide1.png',
+      'https://example.com/slide2.png',
+    ]);
+
+  await ctx.replyWithRichMessage(report);
+});
+```
 
 ### Static Factory Methods
 
@@ -763,6 +877,18 @@ const draft = RichMessage.draft('Drafting text...', 12345);
 
 // Create an Ephemeral Message
 const expiring = RichMessage.ephemeral('Expiring note', 30);
+
+// Create a Table Rich Message
+const tableCard = RichMessage.table(['ID', 'Item', 'Price'], [
+  ['#1', 'Server Pro', '$49/mo'],
+  ['#2', 'Database Addon', '$19/mo'],
+]);
+
+// Create a Compact Table Rich Message (Optimized for Mobile)
+const compactCard = RichMessage.compactTable(['Crypto', 'Change'], [
+  ['BTC', '+5.4%'],
+  ['ETH', '+2.1%'],
+]);
 ```
 
 ### Complete Interactive Rich Card Example
@@ -799,6 +925,442 @@ bot.command('dashboard', async (ctx) => {
 
   await ctx.replyWithRichMessage(dashboard);
 });
+```
+
+---
+
+## 📊 Table & Grid Formatting Suite (`Table` & `InputRichBlockTable`)
+
+Telegram does not have a native HTML `<table>` tag, meaning standard HTML tables fail to render. Telegix solves this by providing a comprehensive, zero-dependency **`Table`** formatting suite and native **Bot API 10.3 `InputRichBlockTable`** support.
+
+Whether you need modern Telegram Bot card tables with rounded borders and column dividers, Unicode box borders, minimal compact lines for mobile screens, or markdown tables, Telegix formats and renders them seamlessly.
+
+### 📱 Telegram Bot Card Tables (Rounded Card with Grid Dividers)
+
+Modern Telegram bots frequently display dashboard and status metrics as **sleek card tables** featuring:
+- 🔲 **Rounded Card Container** (`rx="12"`, `#18222d` background, `#2b3d4f` border)
+- 📐 **Vertical Column Divider Line** cleanly separating labels (left) and values (right)
+- ➖ **Horizontal Row Divider Lines** between every item
+- 🏷️ **Header Banner** with distinct background (`#1c2836`) and bold title
+- 🔵 **Telegram Blue Links** for handles (e.g. `@seventynn`) and protocol URLs
+
+```javascript
+import { Telegix, Table } from 'telegix';
+
+const bot = new Telegix(process.env.BOT_TOKEN);
+
+// Create a custom card table
+const cardTable = Table.card(
+  ['📦 SYSTEM', 'Status'],
+  [
+    ['Engine', 'Telegix'],
+    ['Runtime', '0h 19m 32s'],
+    ['Node', 'v23.11'],
+    ['Features', 514],
+    ['Groups', 168],
+    ['Users', 9528],
+  ]
+);
+
+// Method 1: Send directly with ctx helper
+bot.command('status', async (ctx) => {
+  await ctx.replyWithTableCard(cardTable);
+});
+
+// Method 2: Send as vector card image
+bot.command('card_img', async (ctx) => {
+  await ctx.replyWithTableCard(cardTable, [], { asImage: true });
+});
+```
+
+### 🤖 Pre-Configured & Fully Customizable System & User Profile Cards
+
+Telegix provides built-in card factories and context helpers for status monitoring and user profile displays with **full customization support**:
+
+#### 1. Arbitrary Dynamic Fields
+Pass any custom key-value pairs; Telegix automatically formats human-readable labels from keys (e.g. `ram_usage` -> `Ram Usage`, `db_cluster` -> `Db Cluster`):
+
+```javascript
+// System Status with custom metrics
+await ctx.replyWithSystemStatus({
+  engine: 'Telegix',
+  runtime: '3d 14h 28m',
+  node: process.version,
+  features: 514,
+  groups: 168,
+  users: 9528,
+  ram_usage: '142 MB / 1024 MB',
+  database: 'PostgreSQL 17',
+  active_cluster: 'Singapore-Node-1',
+  ping: '14ms',
+});
+
+// User Profile with custom fields
+await ctx.replyWithUserProfile({
+  username: '@alice_dev',
+  status: 'VIP Elite Member',
+  balance: '$250.00 USD',
+  reward_points: 14500,
+  api_quota: 'Unlimited',
+  registered: 'September 2026',
+});
+```
+
+#### 2. Custom Header Title & Subtitle
+Customize the card header banner text:
+
+```javascript
+await ctx.replyWithSystemStatus({
+  title: '🖥️ CLUSTER MONITOR',
+  subtitle: 'Region Asia-Southeast1',
+  engine: 'Telegix Engine',
+  runtime: '12h 45m',
+  memory_load: '32%',
+});
+
+await ctx.replyWithUserProfile({
+  title: '👑 VIP MEMBERSHIP',
+  subtitle: 'Tier 3 Account',
+  username: '@seventynn',
+  status: 'Verified Developer',
+});
+```
+
+#### 3. Raw Structured 2D Array Matrix
+Supply exact rows without key formatting:
+
+```javascript
+await ctx.replyWithSystemStatus({
+  title: '📊 TELEMETRY',
+  rows: [
+    ['Cluster Pod', 'k8s-sg-node-01'],
+    ['CPU Throttling', '0.00%'],
+    ['Memory Pressure', 'Normal'],
+  ],
+});
+```
+
+### 💎 Multi-Card Stacking (`Table.multiCardSvg` & `ctx.replyWithCardTables`)
+
+Stack multiple cards (such as SYSTEM and PROFILE) in a single message or render them unified:
+
+```javascript
+bot.command('dashboard', async (ctx) => {
+  const sysCard = Table.systemStatus();
+  const profileCard = Table.userProfile({
+    username: ctx.from?.username ? `@${ctx.from.username}` : '@seventynn',
+  });
+
+  // Sends both cards stacked together cleanly in chat
+  await ctx.replyWithCardTables([sysCard, profileCard]);
+
+  // Or send as a single unified high-definition graphic:
+  // await ctx.replyWithCardTables([sysCard, profileCard], { asImage: true });
+});
+```
+
+### Monospaced Text Tables (Box, ASCII, Compact, Markdown)
+
+```javascript
+import { Table } from 'telegix';
+
+const headers = ['Symbol', 'Asset', 'Price', '24h'];
+const rows = [
+  ['BTC', 'Bitcoin', '$64,250', '+3.2%'],
+  ['ETH', 'Ethereum', '$3,480', '+1.8%'],
+  ['SOL', 'Solana', '$142.50', '+5.9%'],
+  ['TON', 'Toncoin', '$5.60', '+8.1%'],
+];
+
+// 1. Box Style (Unicode border: ┌───┬───┐)
+const boxTable = Table.box(headers, rows, {
+  title: '📈 Market Leaders',
+  alignments: ['left', 'left', 'right', 'right'],
+});
+
+// 2. Compact Style (Minimal divider, optimized for small mobile phone screens)
+const compactTable = Table.compact(headers, rows);
+
+// 3. ASCII Style (Classic terminal style: +---+---+)
+const asciiTable = Table.ascii(headers, rows);
+
+// 4. Markdown Style (GitHub flavored markdown table)
+const mdTable = Table.markdown(headers, rows);
+
+// 5. HTML Pre-Formatted Helper (Wraps table in <pre> tags for ctx.reply)
+const htmlTable = new Table(headers, rows).toHtml({
+  style: 'box',
+  title: 'Cryptocurrency Rates',
+});
+```
+
+### Direct Context Table Replies (`ctx.replyWithTable`)
+
+Send beautiful formatted tables with a single function call:
+
+```javascript
+bot.command('rates', async (ctx) => {
+  const headers = ['Plan', 'Storage', 'Price'];
+  const rows = [
+    ['Starter', '10 GB', '$5/mo'],
+    ['Pro', '100 GB', '$15/mo'],
+    ['Enterprise', '1 TB', '$49/mo'],
+  ];
+
+  // Dispatches an HTML pre-formatted table wrapped in <pre>
+  await ctx.replyWithTable(headers, rows, {
+    style: 'box', // 'box' | 'compact' | 'ascii' | 'markdown'
+    title: '💾 Cloud Storage Plans',
+    alignments: ['left', 'center', 'right'],
+  });
+});
+```
+
+### Generating Tables from Objects (`Table.fromObjects`)
+
+Turn arbitrary JavaScript arrays of objects directly into tables without manual data mapping:
+
+```javascript
+const users = [
+  { id: 101, name: 'Alice', role: 'Admin', score: 98 },
+  { id: 102, name: 'Bob', role: 'Editor', score: 85 },
+  { id: 103, name: 'Charlie', role: 'Viewer', score: 72 },
+];
+
+// Automatically extracts column names and values:
+const table = Table.fromObjects(users, ['id', 'name', 'role', 'score'], {
+  style: 'compact',
+  title: '👥 Team Directory',
+});
+
+await ctx.reply(table.toHtml(), { parse_mode: 'HTML' });
+```
+
+### Bot API 10.3 Native Rich Table Blocks
+
+For clients supporting **Bot API 10.3** structured blocks, use `RichMessage.table()` or `InputRichBlockTable` directly:
+
+```javascript
+import { RichMessage, Markup } from 'telegix';
+
+bot.command('leaderboard', async (ctx) => {
+  const card = RichMessage.card('🏆 Tournament Standings', 'Season 4 Grand Finalists')
+    .header('Top Scorers', '🥇')
+    .table(
+      ['Rank', 'Player', 'Score'],
+      [
+        ['1st', 'Alex', '4,850'],
+        ['2nd', 'Beatrix', '4,720'],
+        ['3rd', 'Carlos', '4,210'],
+      ],
+      { is_compact: true } // Bot API 10.3 is_compact flag
+    )
+    .divider()
+    .row(
+      Markup.button.primary('🔄 Refresh Standings', 'refresh_leaderboard'),
+      Markup.button.url('🌐 Full Web Table', 'https://example.com/tournament')
+    );
+
+  await ctx.replyWithRichMessage(card);
+});
+```
+
+---
+
+## 📸 Live Photos Suite (Bot API 10.2+)
+
+Telegram Bot API 10.2 introduced support for sending **Live Photos**—interactive photos paired with micro-videos that animate when tapped and held in Telegram clients.
+
+Telegix provides both context helper methods (`ctx.replyWithLivePhoto`) and low-level API client methods (`bot.telegram.sendLivePhoto`):
+
+```javascript
+import { Telegix } from 'telegix';
+
+const bot = new Telegix(process.env.BOT_TOKEN);
+
+// 1. Context Reply Shortcut: ctx.replyWithLivePhoto(photo, video, extra?)
+bot.command('livephoto', async (ctx) => {
+  await ctx.replyWithLivePhoto(
+    'https://example.com/photo.jpg',
+    'https://example.com/live_motion.mp4',
+    {
+      caption: '📸 <b>Interactive Live Photo</b>\n<i>Tap and hold to play animation!</i>',
+      parse_mode: 'HTML',
+    }
+  );
+});
+
+// 2. Telegram API Client: bot.telegram.sendLivePhoto(chatId, photo, video, extra?)
+await bot.telegram.sendLivePhoto(
+  chatId,
+  'https://example.com/photo.jpg',
+  'https://example.com/live_motion.mp4',
+  { caption: 'Captured Live Moment' }
+);
+```
+
+---
+
+## ↩️ Extended Reply Parameters & Ephemeral Commands (Bot API 10.2+)
+
+Telegram Bot API 10.2 expanded `ReplyParameters` and bot command configurations with specialized fields for fine-grained reply targets and message visibility.
+
+### 1. Extended ReplyParameters (`checklist_task_id`, `poll_option_id`, `is_ephemeral`)
+
+You can now target specific checklist tasks, poll options, or designate replies as ephemeral:
+
+```javascript
+import { ReplyParameters } from 'telegix';
+
+// Target a specific task item inside an interactive checklist
+bot.command('check_done', async (ctx) => {
+  await ctx.reply('✅ Task #2 marked completed!', {
+    reply_parameters: {
+      message_id: ctx.message?.message_id,
+      checklist_task_id: 2, // Bot API 10.2+
+      allow_sending_without_reply: true,
+    },
+  });
+});
+
+// Target a specific option within a poll
+bot.command('poll_comment', async (ctx) => {
+  await ctx.reply('Insightful vote on option #1!', {
+    reply_parameters: new ReplyParameters({
+      message_id: targetPollMessageId,
+      poll_option_id: 'opt_1', // Bot API 10.2+
+    }),
+  });
+});
+```
+
+### 2. Ephemeral Bot Commands (`BotCommand.is_ephemeral`)
+
+Mark specific bot commands as ephemeral so their responses are only visible to the user who invoked them, keeping group conversations clean:
+
+```javascript
+import { BotCommand } from 'telegix';
+
+const commands = [
+  new BotCommand('start', 'Open main menu'),
+  new BotCommand('help', 'Show help information'),
+  new BotCommand('mybalance', 'Check personal balance privately', {
+    is_ephemeral: true, // Bot API 10.2+
+  }),
+];
+
+await bot.telegram.setMyCommands(commands);
+```
+
+---
+
+## 🔵 Blue Text & Telegram Protocol Links (`tg://`, `documentLink`, `userLink`)
+
+In Telegram chats, clickable links and protocol handlers are rendered in Telegram's signature **blue text color**. Telegix provides first-class helpers to generate these links cleanly across HTML, Markdown, and template literals:
+
+### Blue Document Links (`tg://document?id=...`)
+
+Generate blue clickable download links pointing directly to Telegram document file IDs or catalog items without external web servers:
+
+```javascript
+import { fmt, html, markdown } from 'telegix';
+
+// 1. Using HTML helper: html.documentLink(documentId, text)
+const docLinkHtml = html.documentLink('10987654321', '📄 Download Financial Q3 Report (Blue Text)');
+// -> <a href="tg://document?id=10987654321">📄 Download Financial Q3 Report (Blue Text)</a>
+
+// 2. Using Markdown helper: markdown.documentLink(documentId, text)
+const docLinkMd = markdown.documentLink('10987654321', 'Download Specification');
+// -> [Download Specification](tg://document?id=10987654321)
+
+// 3. Using Tagged Template Literal: fmt.documentLink
+bot.command('specs', async (ctx) => {
+  await ctx.reply(
+    fmt`
+📋 <b>Project Specifications</b>
+
+Click the blue document link below to open the file:
+${fmt.documentLink('987654321', '📄 View Architecture Blueprint')}
+    `,
+    { parse_mode: 'HTML' }
+  );
+});
+```
+
+### Blue User Mention Links (`tg://user?id=...`)
+
+Generate blue profile links that open a user's Telegram profile card when tapped:
+
+```javascript
+import { html, fmt } from 'telegix';
+
+bot.command('moderator', async (ctx) => {
+  const modId = 123456789;
+  const modName = 'Support Admin';
+
+  await ctx.reply(
+    fmt`Need assistance? Contact our on-duty moderator: ${html.userLink(modId, modName)}`,
+    { parse_mode: 'HTML' }
+  );
+});
+```
+
+### Blue Primary Buttons & Colored Buttons
+
+Telegram Bot API 9.4+ introduced colored inline buttons. Use `Markup.button.primary()` to render prominent blue action buttons that match Telegram's blue link aesthetic:
+
+```javascript
+import { Markup } from 'telegix';
+
+const blueKeyboard = Markup.inlineKeyboard([
+  [
+    Markup.button.primary('🔵 Primary Action (Blue)', 'btn_primary_click'),
+    Markup.button.url('🌐 Blue Web Link', 'https://telegix.dev'),
+  ],
+  [
+    Markup.button.colored('📄 Document Protocol', 'primary', 'tg://document?id=12345'),
+  ],
+]);
+
+await ctx.reply('Select an action:', blueKeyboard);
+```
+
+---
+
+## ⏱️ Ephemeral Messages & Auto-Disappearing Lifetimes (`EphemeralMessageParameters`)
+
+Telegram Bot API 10.3 introduced **Ephemeral Messages** — temporary messages configured with an automatic lifetime that vanish after the specified duration expires.
+
+Telegix provides the `EphemeralMessageParameters` builder and native `ctx.replyEphemeral()` shortcut:
+
+```javascript
+import { EphemeralMessageParameters } from 'telegix';
+
+// 1. Direct Context shortcut with duration in seconds:
+bot.command('secret', async (ctx) => {
+  // Automatically self-destructs in 15 seconds
+  await ctx.replyEphemeral('🤫 This secret passcode will disappear in 15 seconds: 884-219', 15);
+});
+
+// 2. Fluent EphemeralMessageParameters builder:
+bot.action('show_token', async (ctx) => {
+  await ctx.answerCallbackQuery();
+
+  const params = EphemeralMessageParameters.create(30)
+    .receiver(ctx.from.id)             // Target specific user ID
+    .callbackQuery(ctx.callbackQuery.id) // Bind to callback query
+    .replaceCallbackQueryMessage(true);  // Replace origin message
+
+  await ctx.replyEphemeral(
+    '🔑 <b>Single-Use Access Token:</b> <code>tok_99182a8bf3</code>\n<i>Disappears in 30s.</i>',
+    params,
+    { parse_mode: 'HTML' }
+  );
+});
+
+// 3. Edit or delete ephemeral messages:
+await ctx.editEphemeralMessageText('Updated ephemeral text');
+await ctx.deleteEphemeralMessage();
 ```
 
 ---
@@ -1867,6 +2429,7 @@ The `Telegram` client exposes every official method of the Telegram Bot API:
 - `forwardMessage(chatId, fromChatId, messageId, extra?)` / `forwardMessages(chatId, fromChatId, messageIds, extra?)`
 - `copyMessage(chatId, fromChatId, messageId, extra?)` / `copyMessages(chatId, fromChatId, messageIds, extra?)`
 - `sendPhoto(chatId, photo, extra?)`
+- `sendLivePhoto(chatId, photo, video, extra?)` — Send dynamic interactive Live Photo (**Bot API 10.2+**).
 - `sendAudio(chatId, audio, extra?)`
 - `sendDocument(chatId, document, extra?)`
 - `sendVideo(chatId, video, extra?)`
@@ -1981,6 +2544,32 @@ The `Telegram` client exposes every official method of the Telegram Bot API:
 
 ---
 
+## 💡 Example Scripts & Demos
+
+The repository includes a rich collection of production-ready, executable examples in the [`examples/`](./examples) directory and in root `example.js`:
+
+| Example File | Description |
+|---|---|
+| [`examples/18-live-photos-checklists-and-cards.js`](./examples/18-live-photos-checklists-and-cards.js) | **Bot API 10.2+ & Modern Features**: Live Photos (`replyWithLivePhoto`), interactive Checklists, AI thinking indicator, media collages & slideshows, custom status & user cards, and ephemeral commands. |
+| [`examples/17-tables-and-rich-messages.js`](./examples/17-tables-and-rich-messages.js) | **Tables, Blue Text & Bot API 10.3 Rich Messages**: Box/Compact/Markdown tables, `ctx.replyWithTable`, blue document & user links, and ephemeral messages. |
+| [`examples/14-bot-api-10.3-features.js`](./examples/14-bot-api-10.3-features.js) | **Bot API 10.3 Core Suite**: Rich messages, tables, drafts, managed bot settings, and disappearing messages. |
+| [`example.js`](./example.js) | **Comprehensive Interactive Test Suite**: Full-featured bot showcasing all capabilities with an interactive inline button menu. |
+| [`examples/01-basic-bot.js`](./examples/01-basic-bot.js) | Minimal starter bot with slash commands and text replies. |
+| [`examples/03-keyboard-markup.js`](./examples/03-keyboard-markup.js) | Custom reply keyboards, inline buttons, colored buttons, and WebApp buttons. |
+| [`examples/04-photo-media.js`](./examples/04-photo-media.js) | Sending photos, albums, audio, voice notes, and documents. |
+| [`examples/07-session-wizard.js`](./examples/07-session-wizard.js) | State persistence with memory & file session stores. |
+| [`examples/08-telegram-stars-payments.js`](./examples/08-telegram-stars-payments.js) | Invoices, digital goods, and Telegram Stars (`XTR`) payments. |
+| [`examples/12-scenes-wizard.js`](./examples/12-scenes-wizard.js) | Multi-step interactive conversation state machine (`WizardScene` & `Stage`). |
+| [`examples/13-formatting-fmt.js`](./examples/13-formatting-fmt.js) | XSS-safe tagged template literals (`fmt`), collapsible quotes, and entity escaping. |
+| [`examples/15-i18n-and-ratelimit.js`](./examples/15-i18n-and-ratelimit.js) | Multi-language localization and rolling-window rate limiting. |
+
+To run any example:
+```bash
+BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN" node examples/17-tables-and-rich-messages.js
+```
+
+---
+
 ## 🟦 TypeScript Support
 
 Telegix comes with zero-config TypeScript type declarations included in `index.d.ts`:
@@ -2007,4 +2596,16 @@ bot.command('count', async (ctx) => {
 
 ---
 
+## 🧪 Running Tests
+
+Execute the automated test suite locally:
+
+```bash
+node test/test.js
+```
+
 ---
+
+## 📄 License
+
+MIT License © 2026 Michael Agam & Telegix Contributors.

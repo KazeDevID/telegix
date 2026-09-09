@@ -30,16 +30,48 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   BaseScene: () => BaseScene,
+  BotCommand: () => BotCommand,
   Composer: () => Composer,
   Context: () => Context,
+  EphemeralMessageParameters: () => EphemeralMessageParameters,
   FileSessionStore: () => FileSessionStore,
   Format: () => Format,
   I18n: () => I18n,
   InlineQueryResultBuilder: () => InlineQueryResultBuilder,
+  InputMediaVoiceNote: () => InputMediaVoiceNote,
+  InputRichBlockAnchor: () => InputRichBlockAnchor,
+  InputRichBlockAnimation: () => InputRichBlockAnimation,
+  InputRichBlockAudio: () => InputRichBlockAudio,
+  InputRichBlockBlockQuotation: () => InputRichBlockBlockQuotation,
+  InputRichBlockButtons: () => InputRichBlockButtons,
+  InputRichBlockChecklist: () => InputRichBlockChecklist,
+  InputRichBlockCollage: () => InputRichBlockCollage,
+  InputRichBlockDetails: () => InputRichBlockDetails,
+  InputRichBlockDivider: () => InputRichBlockDivider,
+  InputRichBlockDocument: () => InputRichBlockDocument,
+  InputRichBlockExpandableBlockQuotation: () => InputRichBlockExpandableBlockQuotation,
+  InputRichBlockFooter: () => InputRichBlockFooter,
+  InputRichBlockList: () => InputRichBlockList,
+  InputRichBlockListItem: () => InputRichBlockListItem,
+  InputRichBlockMap: () => InputRichBlockMap,
+  InputRichBlockMathematicalExpression: () => InputRichBlockMathematicalExpression,
+  InputRichBlockParagraph: () => InputRichBlockParagraph,
+  InputRichBlockPhoto: () => InputRichBlockPhoto,
+  InputRichBlockPreformatted: () => InputRichBlockPreformatted,
+  InputRichBlockPullQuotation: () => InputRichBlockPullQuotation,
+  InputRichBlockSectionHeading: () => InputRichBlockSectionHeading,
+  InputRichBlockSlideshow: () => InputRichBlockSlideshow,
+  InputRichBlockTable: () => InputRichBlockTable,
+  InputRichBlockThinking: () => InputRichBlockThinking,
+  InputRichBlockVideo: () => InputRichBlockVideo,
+  InputRichBlockVoiceNote: () => InputRichBlockVoiceNote,
+  InputRichMessage: () => InputRichMessage,
+  InputRichMessageMedia: () => InputRichMessageMedia,
   InvoiceBuilder: () => InvoiceBuilder,
   KeyboardBuilder: () => KeyboardBuilder,
   LinkPreview: () => LinkPreview,
   Markup: () => Markup,
+  MediaVoiceNote: () => MediaVoiceNote,
   MemorySessionStore: () => MemorySessionStore,
   MiniApp: () => MiniApp,
   MiniAppLoadingScreen: () => MiniAppLoadingScreen,
@@ -47,10 +79,43 @@ __export(index_exports, {
   Polling: () => Polling,
   PollingError: () => PollingError,
   RateLimiter: () => RateLimiter,
+  ReplyParameters: () => ReplyParameters,
+  RichBlockAnchor: () => RichBlockAnchor,
+  RichBlockAnimation: () => RichBlockAnimation,
+  RichBlockAudio: () => RichBlockAudio,
+  RichBlockBlockQuotation: () => RichBlockBlockQuotation,
+  RichBlockButtons: () => RichBlockButtons,
+  RichBlockChecklist: () => RichBlockChecklist,
+  RichBlockCollage: () => RichBlockCollage,
+  RichBlockDetails: () => RichBlockDetails,
+  RichBlockDivider: () => RichBlockDivider,
+  RichBlockDocument: () => RichBlockDocument,
+  RichBlockExpandableBlockQuotation: () => RichBlockExpandableBlockQuotation,
+  RichBlockFooter: () => RichBlockFooter,
+  RichBlockList: () => RichBlockList,
+  RichBlockListItem: () => RichBlockListItem,
+  RichBlockMap: () => RichBlockMap,
+  RichBlockMath: () => RichBlockMath,
+  RichBlockMathematicalExpression: () => RichBlockMathematicalExpression,
+  RichBlockParagraph: () => RichBlockParagraph,
+  RichBlockPhoto: () => RichBlockPhoto,
+  RichBlockPreformatted: () => RichBlockPreformatted,
+  RichBlockPullQuotation: () => RichBlockPullQuotation,
+  RichBlockPullQuote: () => RichBlockPullQuote,
+  RichBlockSectionHeading: () => RichBlockSectionHeading,
+  RichBlockSlideshow: () => RichBlockSlideshow,
+  RichBlockTable: () => RichBlockTable,
+  RichBlockThinking: () => RichBlockThinking,
+  RichBlockVideo: () => RichBlockVideo,
+  RichBlockVoiceNote: () => RichBlockVoiceNote,
   RichMessage: () => RichMessage,
   RichMessageBuilder: () => RichMessageBuilder,
+  RichMessageButton: () => RichMessageButton,
+  RichMessageMedia: () => RichMessageMedia,
+  RichTextButton: () => RichTextButton,
   Scene: () => Scene,
   Stage: () => Stage,
+  Table: () => Table,
   Telegix: () => Telegix,
   TelegixError: () => TelegixError,
   TelegixManager: () => TelegixManager,
@@ -672,13 +737,1444 @@ async function streamText(telegram, chatId, textStream, options = {}) {
   }
 }
 
+// lib/format.js
+function escapeHtml(text) {
+  if (text === null || text === void 0) return "";
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function escapeMarkdown(text) {
+  if (text === null || text === void 0) return "";
+  return String(text).replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
+}
+var html = {
+  escape: escapeHtml,
+  bold: (text) => `<b>${escapeHtml(text)}</b>`,
+  italic: (text) => `<i>${escapeHtml(text)}</i>`,
+  underline: (text) => `<u>${escapeHtml(text)}</u>`,
+  strikethrough: (text) => `<s>${escapeHtml(text)}</s>`,
+  spoiler: (text) => `<span class="tg-spoiler">${escapeHtml(text)}</span>`,
+  code: (text) => `<code>${escapeHtml(text)}</code>`,
+  pre: (codeText, language = "") => {
+    const langAttr = language ? ` class="language-${escapeHtml(language)}"` : "";
+    return `<pre><code${langAttr}>${escapeHtml(codeText)}</code></pre>`;
+  },
+  link: (text, url) => `<a href="${escapeHtml(url)}">${escapeHtml(text)}</a>`,
+  documentLink: (documentId, text = "Document") => `<a href="tg://document?id=${escapeHtml(documentId)}">${escapeHtml(text)}</a>`,
+  mention: (text, userId) => `<a href="tg://user?id=${userId}">${escapeHtml(text)}</a>`,
+  userLink: (userIdOrText, textOrUserId) => {
+    let userId;
+    let text;
+    if (typeof userIdOrText === "number" || /^\d+$/.test(String(userIdOrText))) {
+      userId = userIdOrText;
+      text = textOrUserId || "User";
+    } else {
+      text = userIdOrText;
+      userId = textOrUserId;
+    }
+    return `<a href="tg://user?id=${userId}">${escapeHtml(text)}</a>`;
+  },
+  customEmoji: (text, customEmojiId) => `<tg-emoji emoji-id="${customEmojiId}">${escapeHtml(text)}</tg-emoji>`,
+  quote: (text) => `<blockquote>${escapeHtml(text)}</blockquote>`,
+  expandableBlockquote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`,
+  expandableQuote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`,
+  collapsibleQuote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`
+};
+var markdown = {
+  escape: escapeMarkdown,
+  bold: (text) => `*${escapeMarkdown(text)}*`,
+  italic: (text) => `_${escapeMarkdown(text)}_`,
+  underline: (text) => `__${escapeMarkdown(text)}__`,
+  strikethrough: (text) => `~${escapeMarkdown(text)}~`,
+  spoiler: (text) => `||${escapeMarkdown(text)}||`,
+  code: (text) => `\`${escapeMarkdown(text)}\``,
+  pre: (codeText, language = "") => `\`\`\`${language}
+${codeText.replace(/\\/g, "\\\\").replace(/`/g, "\\`")}
+\`\`\``,
+  link: (text, url) => `[${escapeMarkdown(text)}](${url.replace(/([)\\])/g, "\\$1")})`,
+  documentLink: (documentId, text = "Document") => `[${escapeMarkdown(text)}](tg://document?id=${documentId})`,
+  mention: (text, userId) => `[${escapeMarkdown(text)}](tg://user?id=${userId})`,
+  userLink: (userIdOrText, textOrUserId) => {
+    let userId;
+    let text;
+    if (typeof userIdOrText === "number" || /^\d+$/.test(String(userIdOrText))) {
+      userId = userIdOrText;
+      text = textOrUserId || "User";
+    } else {
+      text = userIdOrText;
+      userId = textOrUserId;
+    }
+    return `[${escapeMarkdown(text)}](tg://user?id=${userId})`;
+  },
+  customEmoji: (text, customEmojiId) => `![${escapeMarkdown(text)}](tg://emoji?id=${customEmojiId})`,
+  quote: (text) => text.split("\n").map((line) => `>${escapeMarkdown(line)}`).join("\n"),
+  expandableBlockquote: (text) => `**>${escapeMarkdown(text)}||`,
+  expandableQuote: (text) => `**>${escapeMarkdown(text)}||`,
+  collapsibleQuote: (text) => `**>${escapeMarkdown(text)}||`
+};
+function fmt(strings, ...values) {
+  let result = "";
+  for (let i = 0; i < strings.length; i++) {
+    result += strings[i];
+    if (i < values.length) {
+      const val = values[i];
+      if (val === null || val === void 0) {
+      } else if (typeof val === "object" && val.rawHtml) {
+        result += val.rawHtml;
+      } else {
+        result += escapeHtml(String(val));
+      }
+    }
+  }
+  return result;
+}
+fmt.bold = html.bold;
+fmt.italic = html.italic;
+fmt.underline = html.underline;
+fmt.strikethrough = html.strikethrough;
+fmt.spoiler = html.spoiler;
+fmt.code = html.code;
+fmt.pre = html.pre;
+fmt.link = html.link;
+fmt.documentLink = html.documentLink;
+fmt.mention = html.mention;
+fmt.userLink = html.userLink;
+fmt.customEmoji = html.customEmoji;
+fmt.quote = html.quote;
+fmt.expandableBlockquote = html.expandableBlockquote;
+fmt.expandableQuote = html.expandableQuote;
+fmt.collapsibleQuote = html.collapsibleQuote;
+fmt.escape = escapeHtml;
+fmt.html = html;
+fmt.markdown = markdown;
+fmt.raw = (str) => ({ rawHtml: String(str) });
+var Format = fmt;
+
+// lib/table.js
+var STYLES = {
+  box: {
+    topLeft: "\u250C",
+    topMid: "\u252C",
+    topRight: "\u2510",
+    midLeft: "\u251C",
+    midMid: "\u253C",
+    midRight: "\u2524",
+    bottomLeft: "\u2514",
+    bottomMid: "\u2534",
+    bottomRight: "\u2518",
+    horizontal: "\u2500",
+    vertical: "\u2502"
+  },
+  ascii: {
+    topLeft: "+",
+    topMid: "+",
+    topRight: "+",
+    midLeft: "+",
+    midMid: "+",
+    midRight: "+",
+    bottomLeft: "+",
+    bottomMid: "+",
+    bottomRight: "+",
+    horizontal: "-",
+    vertical: "|"
+  },
+  compact: {
+    topLeft: "",
+    topMid: " ",
+    topRight: "",
+    midLeft: "",
+    midMid: "\u253C",
+    midRight: "",
+    bottomLeft: "",
+    bottomMid: "",
+    bottomRight: "",
+    horizontal: "\u2500",
+    vertical: "\u2502"
+  },
+  clean: {
+    topLeft: "",
+    topMid: "",
+    topRight: "",
+    midLeft: "",
+    midMid: "   ",
+    midRight: "",
+    bottomLeft: "",
+    bottomMid: "",
+    bottomRight: "",
+    horizontal: "\u2500",
+    vertical: "   "
+  },
+  card: {
+    topLeft: "\u256D",
+    topMid: "\u252C",
+    topRight: "\u256E",
+    midLeft: "\u251C",
+    midMid: "\u253C",
+    midRight: "\u2524",
+    bottomLeft: "\u2570",
+    bottomMid: "\u2534",
+    bottomRight: "\u256F",
+    horizontal: "\u2500",
+    vertical: "\u2502"
+  }
+};
+function visualLength(val) {
+  if (val === null || val === void 0) return 0;
+  return String(val).length;
+}
+function pad(val, width, align = "left") {
+  const str = val === null || val === void 0 ? "" : String(val);
+  const diff = width - visualLength(str);
+  if (diff <= 0) return str;
+  if (align === "right") {
+    return " ".repeat(diff) + str;
+  }
+  if (align === "center") {
+    const left = Math.floor(diff / 2);
+    const right = diff - left;
+    return " ".repeat(left) + str + " ".repeat(right);
+  }
+  return str + " ".repeat(diff);
+}
+function escapeSvg(val) {
+  if (val === null || val === void 0) return "";
+  return String(val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+var Table = class _Table {
+  /**
+   * @param {Array<string>|object} [headersOrOptions={}]
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  constructor(headersOrOptions = {}, rows = [], options = {}) {
+    this.type = "table";
+    let opts = {};
+    if (Array.isArray(headersOrOptions)) {
+      this.headers = [...headersOrOptions];
+      this.rows = Array.isArray(rows) ? rows.map((r) => [...r]) : [];
+      opts = options || {};
+    } else {
+      opts = headersOrOptions || {};
+      this.headers = opts.headers ? [...opts.headers] : [];
+      this.rows = opts.rows ? opts.rows.map((r) => [...r]) : [];
+    }
+    this.is_bordered = Boolean(opts.is_bordered ?? opts.isBordered ?? true);
+    this.is_compact = Boolean(opts.is_compact ?? opts.isCompact ?? false);
+    this.is_striped = Boolean(opts.is_striped ?? opts.isStriped ?? false);
+    this.caption = opts.caption || "";
+    this._style = opts.style || "card";
+    this._title = opts.title || "";
+    this._alignments = opts.alignments ? [...opts.alignments] : [];
+    this.col1Width = opts.col1Width;
+    this.asImage = Boolean(opts.asImage || opts.photo || opts.image);
+    this._cardOptions = { ...opts };
+  }
+  /**
+   * Set headers
+   * @param {Array<string>|...string} headers
+   * @returns {this}
+   */
+  header(...headers) {
+    if (headers.length === 1 && Array.isArray(headers[0])) {
+      this.headers = [...headers[0]];
+    } else {
+      this.headers = headers.flat();
+    }
+    return this;
+  }
+  /**
+   * Set headers (alias)
+   * @param {Array<string>} headers
+   * @returns {this}
+   */
+  setHeaders(headers) {
+    this.headers = Array.isArray(headers) ? [...headers] : [];
+    return this;
+  }
+  /**
+   * Add a row
+   * @param {Array<any>|...any} cells
+   * @returns {this}
+   */
+  row(...cells) {
+    if (cells.length === 1 && Array.isArray(cells[0])) {
+      this.rows.push([...cells[0]]);
+    } else {
+      this.rows.push(cells.flat());
+    }
+    return this;
+  }
+  /**
+   * Add multiple rows
+   * @param {Array<Array<any>>} rows
+   * @returns {this}
+   */
+  addRows(rows) {
+    if (Array.isArray(rows)) {
+      for (const r of rows) {
+        this.row(r);
+      }
+    }
+    return this;
+  }
+  /**
+   * Set table compact mode (Telegram Bot API 10.3)
+   * @param {boolean} [isCompact=true]
+   * @returns {this}
+   */
+  compact(isCompact = true) {
+    this.is_compact = Boolean(isCompact);
+    return this;
+  }
+  /**
+   * Set visual style ('box' | 'ascii' | 'compact' | 'clean' | 'markdown')
+   * @param {string} styleName
+   * @returns {this}
+   */
+  style(styleName) {
+    this._style = styleName;
+    return this;
+  }
+  /**
+   * Set optional table title
+   * @param {string} title
+   * @returns {this}
+   */
+  title(title) {
+    this._title = title;
+    return this;
+  }
+  /**
+   * Set column alignment
+   * @param {number} colIndex
+   * @param {'left'|'center'|'right'} align
+   * @returns {this}
+   */
+  columnAlign(colIndex, align) {
+    this._alignments[colIndex] = align;
+    return this;
+  }
+  /**
+   * Set alignments for all columns
+   * @param {Array<'left'|'center'|'right'>} aligns
+   * @returns {this}
+   */
+  alignments(aligns) {
+    this._alignments = Array.isArray(aligns) ? [...aligns] : [];
+    return this;
+  }
+  /**
+   * Render table as plain formatted monospaced text
+   * @param {object} [options]
+   * @returns {string}
+   */
+  format(options = {}) {
+    const opts = typeof options === "string" ? { style: options } : options || {};
+    return _Table.format(this.headers, this.rows, {
+      style: opts.style || this._style,
+      isCompact: opts.is_compact ?? opts.isCompact ?? this.is_compact,
+      alignments: opts.alignments || this._alignments,
+      title: opts.title || this._title,
+      ...opts
+    });
+  }
+  /**
+   * String coercion
+   */
+  toString() {
+    return this.format();
+  }
+  /**
+   * Render table as HTML wrapped in <pre> tags for Telegram
+   * @param {object} [options]
+   * @returns {string}
+   */
+  toHtml(options = {}) {
+    const formatted = this.format(options);
+    const title = options.title || this._title;
+    const titleHtml = title ? `<b>${escapeHtml(title)}</b>
+
+` : "";
+    return `${titleHtml}<pre>${escapeHtml(formatted)}</pre>`;
+  }
+  /**
+   * Render table as Markdown (or inside ``` code block)
+   * @param {object} [options]
+   * @returns {string}
+   */
+  toMarkdown(options = {}) {
+    return _Table.markdown(this.headers, this.rows, options);
+  }
+  /**
+   * Set table bordered mode (Telegram Bot API 10.3 / Card style)
+   * @param {boolean} [isBordered=true]
+   * @returns {this}
+   */
+  bordered(isBordered = true) {
+    this.is_bordered = Boolean(isBordered);
+    return this;
+  }
+  /**
+   * Set table striped mode (Telegram Bot API 10.3)
+   * @param {boolean} [isStriped=true]
+   * @returns {this}
+   */
+  striped(isStriped = true) {
+    this.is_striped = Boolean(isStriped);
+    return this;
+  }
+  /**
+   * Convert table data into 2D array of RichBlockTableCell for Telegram Bot API 10.3
+   * @returns {Array<Array<object>>}
+   */
+  toCells() {
+    const cells = [];
+    if (this.headers.length > 0) {
+      cells.push(
+        this.headers.map((h, i) => ({
+          text: String(h ?? ""),
+          is_header: true,
+          align: this._alignments[i] || "center",
+          valign: "middle"
+        }))
+      );
+    }
+    for (const row of this.rows) {
+      cells.push(
+        row.map((cell, i) => {
+          if (cell && typeof cell === "object" && cell.text !== void 0) {
+            return {
+              align: this._alignments[i] || "left",
+              valign: "middle",
+              ...cell
+            };
+          }
+          return {
+            text: String(cell ?? ""),
+            align: this._alignments[i] || "left",
+            valign: "middle"
+          };
+        })
+      );
+    }
+    return cells;
+  }
+  /**
+   * Render table as SVG vector graphic matching the Telegram Bot Card Table UI
+   * (dark rounded container, grid borders, headers, and blue clickable links)
+   * @param {object} [options]
+   * @returns {string} SVG XML markup string
+   */
+  toCardSvg(options = {}) {
+    const width = Number(options.width || 420);
+    const maxLabelLen = Math.max(
+      ...this.rows.map((r) => String(r[0] ?? "").length),
+      this.headers[0] ? String(this.headers[0]).length : 0,
+      10
+    );
+    const calculatedCol1 = Math.max(130, Math.min(220, maxLabelLen * 9 + 30));
+    const col1Width = Number(options.col1Width || this.col1Width || calculatedCol1);
+    const headerHeight = Number(options.headerHeight || 38);
+    const rowHeight = Number(options.rowHeight || 36);
+    const hasHeader = this.headers.length > 0;
+    const headerH = hasHeader ? headerHeight : 0;
+    const totalHeight = headerH + this.rows.length * rowHeight;
+    const bgColor = options.bgColor || "#18222d";
+    const borderColor = options.borderColor || "#2b3d4f";
+    const headerBg = options.headerBg || "#1c2836";
+    const labelColor = options.labelColor || "#90a4b7";
+    const valColor = options.valueColor || "#ffffff";
+    const linkColor = options.linkColor || "#5288c1";
+    const fontFamily = options.fontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}">
+`;
+    svg += `  <style>
+`;
+    svg += `    .t-lbl { font-family: ${fontFamily}; font-size: 14px; fill: ${labelColor}; font-weight: 400; }
+`;
+    svg += `    .t-val { font-family: ${fontFamily}; font-size: 14px; fill: ${valColor}; font-weight: 400; }
+`;
+    svg += `    .t-val-bold { font-family: ${fontFamily}; font-size: 14px; fill: ${valColor}; font-weight: 600; }
+`;
+    svg += `    .t-link { font-family: ${fontFamily}; font-size: 14px; fill: ${linkColor}; font-weight: 500; cursor: pointer; }
+`;
+    svg += `    .t-hdr { font-family: ${fontFamily}; font-size: 14px; fill: #ffffff; font-weight: 700; }
+`;
+    svg += `  </style>
+`;
+    svg += `  <rect x="0.5" y="0.5" width="${width - 1}" height="${totalHeight - 1}" rx="12" ry="12" fill="${bgColor}" stroke="${borderColor}" stroke-width="1"/>
+`;
+    if (hasHeader) {
+      const clipId = `clip-top-${Math.floor(Math.random() * 1e6)}`;
+      svg += `  <clipPath id="${clipId}">
+`;
+      svg += `    <rect x="0.5" y="0.5" width="${width - 1}" height="${totalHeight - 1}" rx="12" ry="12" />
+`;
+      svg += `  </clipPath>
+`;
+      svg += `  <rect x="0.5" y="0.5" width="${width - 1}" height="${headerH}" fill="${headerBg}" clip-path="url(#${clipId})"/>
+`;
+      svg += `  <line x1="0" y1="${headerH}" x2="${width}" y2="${headerH}" stroke="${borderColor}" stroke-width="1"/>
+`;
+      const h1 = this.headers[0] ?? "";
+      const h2 = this.headers[1] ?? "";
+      svg += `  <text x="16" y="${Math.round(headerH / 2 + 5)}" class="t-hdr">${escapeSvg(h1)}</text>
+`;
+      if (h2) {
+        svg += `  <text x="${col1Width + 16}" y="${Math.round(headerH / 2 + 5)}" class="t-hdr">${escapeSvg(h2)}</text>
+`;
+      }
+    }
+    svg += `  <line x1="${col1Width}" y1="0" x2="${col1Width}" y2="${totalHeight}" stroke="${borderColor}" stroke-width="1"/>
+`;
+    for (let i = 0; i < this.rows.length; i++) {
+      const row = this.rows[i];
+      const y = headerH + i * rowHeight;
+      if (i > 0 || hasHeader) {
+        svg += `  <line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="${borderColor}" stroke-width="1"/>
+`;
+      }
+      const textY = y + Math.round(rowHeight / 2 + 5);
+      const col1Val = row[0] !== void 0 ? String(row[0]) : "";
+      const col2Val = row[1] !== void 0 ? String(row[1]) : "";
+      svg += `  <text x="16" y="${textY}" class="t-lbl">${escapeSvg(col1Val)}</text>
+`;
+      if (col2Val) {
+        const isLink = col2Val.startsWith("@") || col2Val.startsWith("tg://") || col2Val.startsWith("http");
+        const isBold = options.boldValues === true || options.boldValues !== false && (["telegraf.js", "telegix", "free user", "premium", "active", "online", "pro", "connected", "operational", "success", "ok"].includes(col2Val.toLowerCase()) || i === 0 || !isNaN(Number(col2Val)));
+        const cls = isLink ? "t-link" : isBold ? "t-val-bold" : "t-val";
+        svg += `  <text x="${col1Width + 16}" y="${textY}" class="${cls}">${escapeSvg(col2Val)}</text>
+`;
+      }
+    }
+    svg += `</svg>`;
+    return svg;
+  }
+  /**
+   * Convert SVG table to Buffer (Node.js) or Uint8Array
+   * @param {object} [options]
+   * @returns {Buffer|Uint8Array}
+   */
+  toBuffer(options = {}) {
+    const svg = this.toCardSvg(options);
+    if (typeof Buffer !== "undefined") {
+      return Buffer.from(svg, "utf-8");
+    }
+    return new TextEncoder().encode(svg);
+  }
+  /**
+   * Convert SVG table to base64 Data URL
+   * @param {object} [options]
+   * @returns {string}
+   */
+  toDataUrl(options = {}) {
+    const svg = this.toCardSvg(options);
+    if (typeof Buffer !== "undefined") {
+      return `data:image/svg+xml;base64,${Buffer.from(svg, "utf-8").toString("base64")}`;
+    }
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+  /**
+   * Convert to Telegram Bot API 10.3 InputRichBlockTable / RichBlockTable payload
+   * @returns {object}
+   */
+  toRichBlock() {
+    return {
+      type: "table",
+      is_bordered: this.is_bordered,
+      is_compact: this.is_compact,
+      is_striped: this.is_striped,
+      cells: this.toCells(),
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.headers.length > 0 ? { headers: this.headers } : {},
+      rows: this.rows,
+      ...this._title ? { title: this._title } : {}
+    };
+  }
+  /**
+   * JSON serialization for Bot API 10.3
+   */
+  toJSON() {
+    return this.toRichBlock();
+  }
+  // ==========================================
+  // Static Factory & Formatting Methods
+  // ==========================================
+  /**
+   * Factory method to create a new Table instance
+   * @param {object} [options]
+   * @returns {Table}
+   */
+  static create(options) {
+    return new _Table(options);
+  }
+  /**
+   * Create Table from array of JavaScript objects
+   * @param {Array<object>} array
+   * @param {Array<string>} [columns] - Optional specific columns or keys
+   * @param {object} [options]
+   * @returns {Table}
+   */
+  static fromObjects(array, columns, options = {}) {
+    if (!Array.isArray(array) || array.length === 0) {
+      return new _Table(options);
+    }
+    const cols = columns && columns.length > 0 ? columns : Object.keys(array[0]);
+    const table = new _Table({
+      headers: cols.map((c) => c.charAt(0).toUpperCase() + c.slice(1).replace(/_/g, " ")),
+      ...options
+    });
+    for (const item of array) {
+      const row = cols.map((c) => item[c]);
+      table.row(row);
+    }
+    return table;
+  }
+  /**
+   * Format headers and rows into a formatted string
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   * @param {string} [options.style='box'] - 'box', 'ascii', 'compact', 'clean', 'markdown'
+   * @param {boolean} [options.isCompact=false]
+   * @param {Array<'left'|'center'|'right'>} [options.alignments]
+   * @returns {string}
+   */
+  static format(headers = [], rows = [], options = {}) {
+    const opts = typeof options === "string" ? { style: options } : options || {};
+    const styleName = opts.style || (opts.isCompact || opts.is_compact ? "compact" : "box");
+    if (styleName === "markdown") {
+      return _Table.markdown(headers, rows, opts);
+    }
+    const border = STYLES[styleName] || STYLES.box;
+    const alignments = opts.alignments || [];
+    const isCompact = Boolean(opts.isCompact || opts.is_compact);
+    const numCols = Math.max(
+      headers.length,
+      ...rows.map((r) => Array.isArray(r) ? r.length : 0),
+      1
+    );
+    const colWidths = new Array(numCols).fill(0);
+    for (let c = 0; c < numCols; c++) {
+      if (headers[c] !== void 0) {
+        colWidths[c] = Math.max(colWidths[c], visualLength(headers[c]));
+      }
+      for (const row of rows) {
+        if (row && row[c] !== void 0) {
+          colWidths[c] = Math.max(colWidths[c], visualLength(row[c]));
+        }
+      }
+      colWidths[c] = Math.max(colWidths[c], 1);
+    }
+    const padding = isCompact ? 0 : 1;
+    const padChar = " ";
+    const lines = [];
+    const formatCell = (val, colIdx) => {
+      const w = colWidths[colIdx];
+      const align = alignments[colIdx] || "left";
+      const text = pad(val, w, align);
+      return isCompact ? text : `${padChar}${text}${padChar}`;
+    };
+    const buildBorder = (left, mid, right, horiz) => {
+      if (!left && !mid && !right) return "";
+      const parts = colWidths.map((w) => horiz.repeat(w + (isCompact ? 0 : 2)));
+      return `${left}${parts.join(mid)}${right}`;
+    };
+    if (border.topLeft || border.topMid || border.topRight) {
+      const topRow = buildBorder(border.topLeft, border.topMid, border.topRight, border.horizontal);
+      if (topRow) lines.push(topRow);
+    }
+    if (headers.length > 0) {
+      const headerCells = [];
+      for (let c = 0; c < numCols; c++) {
+        headerCells.push(formatCell(headers[c] ?? "", c));
+      }
+      lines.push(`${border.vertical}${headerCells.join(border.vertical)}${border.vertical}`);
+      if (border.midLeft || border.midMid || border.midRight || border.horizontal) {
+        const midRow = buildBorder(border.midLeft, border.midMid, border.midRight, border.horizontal);
+        if (midRow) lines.push(midRow);
+      }
+    }
+    for (let r = 0; r < rows.length; r++) {
+      const row = rows[r] || [];
+      const cells = [];
+      for (let c = 0; c < numCols; c++) {
+        cells.push(formatCell(row[c] ?? "", c));
+      }
+      lines.push(`${border.vertical}${cells.join(border.vertical)}${border.vertical}`);
+    }
+    if (border.bottomLeft || border.bottomMid || border.bottomRight) {
+      const bottomRow = buildBorder(border.bottomLeft, border.bottomMid, border.bottomRight, border.horizontal);
+      if (bottomRow) lines.push(bottomRow);
+    }
+    return lines.join("\n");
+  }
+  /**
+   * Shortcut for box Unicode table
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   */
+  static box(headers, rows, options = {}) {
+    return _Table.format(headers, rows, { ...options, style: "box" });
+  }
+  /**
+   * Shortcut for ASCII table (+----+----+ etc.)
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   */
+  static ascii(headers, rows, options = {}) {
+    return _Table.format(headers, rows, { ...options, style: "ascii" });
+  }
+  /**
+   * Shortcut for compact table
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   */
+  static compact(headers, rows, options = {}) {
+    return _Table.format(headers, rows, { ...options, style: "compact", isCompact: true });
+  }
+  /**
+   * Generate Markdown table format (| Col 1 | Col 2 |)
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   */
+  static markdown(headers = [], rows = [], options = {}) {
+    const alignments = options.alignments || [];
+    const numCols = Math.max(
+      headers.length,
+      ...rows.map((r) => Array.isArray(r) ? r.length : 0),
+      1
+    );
+    const colWidths = new Array(numCols).fill(3);
+    for (let c = 0; c < numCols; c++) {
+      if (headers[c] !== void 0) {
+        colWidths[c] = Math.max(colWidths[c], visualLength(headers[c]));
+      }
+      for (const row of rows) {
+        if (row && row[c] !== void 0) {
+          colWidths[c] = Math.max(colWidths[c], visualLength(row[c]));
+        }
+      }
+    }
+    const lines = [];
+    const headerCells = [];
+    for (let c = 0; c < numCols; c++) {
+      headerCells.push(pad(headers[c] ?? "", colWidths[c], "left"));
+    }
+    lines.push(`| ${headerCells.join(" | ")} |`);
+    const sepCells = [];
+    for (let c = 0; c < numCols; c++) {
+      const align = alignments[c] || "left";
+      const w = colWidths[c];
+      if (align === "center") {
+        sepCells.push(`:${"-".repeat(Math.max(w - 2, 1))}:`);
+      } else if (align === "right") {
+        sepCells.push(`${"-".repeat(Math.max(w - 1, 1))}:`);
+      } else {
+        sepCells.push(`:${"-".repeat(Math.max(w - 1, 1))}`);
+      }
+    }
+    lines.push(`| ${sepCells.join(" | ")} |`);
+    for (const row of rows) {
+      const cells = [];
+      for (let c = 0; c < numCols; c++) {
+        const align = alignments[c] || "left";
+        cells.push(pad(row[c] ?? "", colWidths[c], align));
+      }
+      lines.push(`| ${cells.join(" | ")} |`);
+    }
+    return lines.join("\n");
+  }
+  /**
+   * Helper to format table directly into HTML with <pre> tag for Telegram
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   */
+  static html(headers, rows, options = {}) {
+    const formatted = _Table.format(headers, rows, options);
+    const title = options.title ? `<b>${escapeHtml(options.title)}</b>
+
+` : "";
+    return `${title}<pre>${escapeHtml(formatted)}</pre>`;
+  }
+  /**
+   * Create a Card Table matching modern Telegram Bot Card Table UI
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} rows
+   * @param {object} [options]
+   * @returns {Table}
+   */
+  static card(headers, rows = [], options = {}) {
+    return new _Table(headers, rows, {
+      style: "card",
+      is_bordered: true,
+      ...options
+    });
+  }
+  /**
+   * Create a pre-configured System Status Card Table (matching Telegram bot screenshot)
+   * @param {object} [data]
+   * @param {object} [options]
+   * @returns {Table}
+   */
+  static systemStatus(data = {}, options = {}) {
+    const defaultData = {
+      engine: "Telegix",
+      runtime: "0h 19m 32s",
+      node: typeof process !== "undefined" && process.version ? process.version : "v23.11",
+      features: 514,
+      groups: 168,
+      users: 9528,
+      ...data
+    };
+    return new _Table(
+      ["\u{1F916} SYSTEM", "Status"],
+      [
+        ["Engine", defaultData.engine],
+        ["Runtime", defaultData.runtime],
+        ["Node", defaultData.node],
+        ["Features", defaultData.features],
+        ["Groups", defaultData.groups],
+        ["Users", defaultData.users]
+      ],
+      {
+        style: "card",
+        is_bordered: true,
+        title: options.title || "",
+        ...options
+      }
+    );
+  }
+  /**
+   * Create a pre-configured User Profile Card Table (matching Telegram bot screenshot)
+   * @param {object} [data]
+   * @param {object} [options]
+   * @returns {Table}
+   */
+  static userProfile(data = {}, options = {}) {
+    const defaultData = {
+      username: "@seventynn",
+      status: "Free User",
+      limit: 0,
+      points: 0,
+      time: "Selasa, 8 September 2026",
+      ...data
+    };
+    return new _Table(
+      ["\u{1F464} PROFILE", "Info"],
+      [
+        ["Username", defaultData.username],
+        ["Status", defaultData.status],
+        ["Limit", defaultData.limit],
+        ["Points", defaultData.points],
+        ["Time", defaultData.time]
+      ],
+      {
+        style: "card",
+        is_bordered: true,
+        title: options.title || "",
+        ...options
+      }
+    );
+  }
+  /**
+   * Render multiple stacked card tables into a single SVG graphic
+   * (e.g. Card 1 SYSTEM and Card 2 PROFILE like in the Telegram bot screenshot)
+   * @param {Array<Table|object>} tables
+   * @param {object} [options]
+   * @returns {string} SVG XML markup string
+   */
+  static multiCardSvg(tables, options = {}) {
+    const list = Array.isArray(tables) ? tables : [tables];
+    const width = Number(options.width || 420);
+    const gap = Number(options.gap || 14);
+    const padding = Number(options.padding || 0);
+    const instances = list.map((t) => {
+      if (t instanceof _Table) return t;
+      if (t && typeof t.toCardSvg === "function") return t;
+      if (t && Array.isArray(t.headers) && Array.isArray(t.rows)) return new _Table(t);
+      if (Array.isArray(t)) return new _Table(t[0], t[1]);
+      return new _Table(t);
+    });
+    let currentY = padding;
+    const renderedParts = [];
+    for (let idx = 0; idx < instances.length; idx++) {
+      const t = instances[idx];
+      const headerH = t.headers.length > 0 ? options.headerHeight || 38 : 0;
+      const tHeight = headerH + t.rows.length * (options.rowHeight || 36);
+      const col1Width = Number(options.col1Width || t.col1Width || Math.round(width * 0.36));
+      const headerHeight = Number(options.headerHeight || 38);
+      const rowHeight = Number(options.rowHeight || 36);
+      const hasHeader = t.headers.length > 0;
+      const bgColor = options.bgColor || "#18222d";
+      const borderColor = options.borderColor || "#2b3d4f";
+      const headerBg = options.headerBg || "#1c2836";
+      let g = `  <g transform="translate(${padding}, ${currentY})">
+`;
+      g += `    <rect x="0.5" y="0.5" width="${width - 1}" height="${tHeight - 1}" rx="12" ry="12" fill="${bgColor}" stroke="${borderColor}" stroke-width="1"/>
+`;
+      if (hasHeader) {
+        const clipId = `multi-clip-${idx}-${currentY}`;
+        g += `    <clipPath id="${clipId}">
+`;
+        g += `      <rect x="0.5" y="0.5" width="${width - 1}" height="${tHeight - 1}" rx="12" ry="12" />
+`;
+        g += `    </clipPath>
+`;
+        g += `    <rect x="0.5" y="0.5" width="${width - 1}" height="${headerH}" fill="${headerBg}" clip-path="url(#${clipId})"/>
+`;
+        g += `    <line x1="0" y1="${headerH}" x2="${width}" y2="${headerH}" stroke="${borderColor}" stroke-width="1"/>
+`;
+        const h1 = t.headers[0] ?? "";
+        const h2 = t.headers[1] ?? "";
+        g += `    <text x="16" y="${Math.round(headerH / 2 + 5)}" class="t-hdr">${escapeSvg(h1)}</text>
+`;
+        if (h2) {
+          g += `    <text x="${col1Width + 16}" y="${Math.round(headerH / 2 + 5)}" class="t-hdr">${escapeSvg(h2)}</text>
+`;
+        }
+      }
+      g += `    <line x1="${col1Width}" y1="0" x2="${col1Width}" y2="${tHeight}" stroke="${borderColor}" stroke-width="1"/>
+`;
+      for (let i = 0; i < t.rows.length; i++) {
+        const row = t.rows[i];
+        const y = headerH + i * rowHeight;
+        if (i > 0 || hasHeader) {
+          g += `    <line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="${borderColor}" stroke-width="1"/>
+`;
+        }
+        const textY = y + Math.round(rowHeight / 2 + 5);
+        const col1Val = row[0] !== void 0 ? String(row[0]) : "";
+        const col2Val = row[1] !== void 0 ? String(row[1]) : "";
+        g += `    <text x="16" y="${textY}" class="t-lbl">${escapeSvg(col1Val)}</text>
+`;
+        if (col2Val) {
+          const isLink = col2Val.startsWith("@") || col2Val.startsWith("tg://") || col2Val.startsWith("http");
+          const isBold = options.boldValues !== false && (["Telegraf.js", "Telegix", "Free User", "Premium", "Active", "Online", "PRO"].includes(col2Val) || i === 0);
+          const cls = isLink ? "t-link" : isBold ? "t-val-bold" : "t-val";
+          g += `    <text x="${col1Width + 16}" y="${textY}" class="${cls}">${escapeSvg(col2Val)}</text>
+`;
+        }
+      }
+      g += `  </g>
+`;
+      renderedParts.push(g);
+      currentY += tHeight + gap;
+    }
+    const totalWidth = width + padding * 2;
+    const totalHeight = currentY - gap + padding;
+    const fontFamily = options.fontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+    const labelColor = options.labelColor || "#90a4b7";
+    const valColor = options.valueColor || "#ffffff";
+    const linkColor = options.linkColor || "#5288c1";
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">
+`;
+    svg += `  <style>
+`;
+    svg += `    .t-lbl { font-family: ${fontFamily}; font-size: 14px; fill: ${labelColor}; font-weight: 400; }
+`;
+    svg += `    .t-val { font-family: ${fontFamily}; font-size: 14px; fill: ${valColor}; font-weight: 400; }
+`;
+    svg += `    .t-val-bold { font-family: ${fontFamily}; font-size: 14px; fill: ${valColor}; font-weight: 600; }
+`;
+    svg += `    .t-link { font-family: ${fontFamily}; font-size: 14px; fill: ${linkColor}; font-weight: 500; cursor: pointer; }
+`;
+    svg += `    .t-hdr { font-family: ${fontFamily}; font-size: 14px; fill: #ffffff; font-weight: 700; }
+`;
+    svg += `  </style>
+`;
+    svg += renderedParts.join("\n");
+    svg += `</svg>`;
+    return svg;
+  }
+};
+var InputRichBlockTable = class _InputRichBlockTable {
+  /**
+   * @param {Array<string>|object} [headersOrOptions]
+   * @param {Array<Array<any>>} [rows]
+   * @param {object} [options]
+   */
+  constructor(headersOrOptions = [], rows = [], options = {}) {
+    this.type = "table";
+    if (headersOrOptions && !Array.isArray(headersOrOptions) && typeof headersOrOptions === "object") {
+      const opt = headersOrOptions;
+      this.headers = opt.headers || [];
+      this.rows = opt.rows || [];
+      this.is_compact = Boolean(opt.is_compact ?? opt.isCompact ?? false);
+      this.is_bordered = Boolean(opt.is_bordered ?? opt.isBordered ?? true);
+      this.is_striped = Boolean(opt.is_striped ?? opt.isStriped ?? false);
+      this.caption = opt.caption || "";
+      this.alignments = opt.alignments || [];
+      this.title = opt.title || "";
+      this.style = opt.style || (this.is_compact ? "compact" : "box");
+      this.col1Width = opt.col1Width;
+    } else {
+      this.headers = Array.isArray(headersOrOptions) ? [...headersOrOptions] : [];
+      this.rows = Array.isArray(rows) ? rows.map((r) => [...r]) : [];
+      this.is_compact = Boolean(options.is_compact ?? options.isCompact ?? false);
+      this.is_bordered = Boolean(options.is_bordered ?? options.isBordered ?? true);
+      this.is_striped = Boolean(options.is_striped ?? options.isStriped ?? false);
+      this.caption = options.caption || "";
+      this.alignments = options.alignments || [];
+      this.title = options.title || "";
+      this.style = options.style || (this.is_compact ? "compact" : "box");
+      this.col1Width = options.col1Width;
+    }
+  }
+  /**
+   * Set compact mode
+   * @param {boolean} [isCompact=true]
+   * @returns {this}
+   */
+  compact(isCompact = true) {
+    this.is_compact = Boolean(isCompact);
+    return this;
+  }
+  /**
+   * Set bordered mode
+   * @param {boolean} [isBordered=true]
+   * @returns {this}
+   */
+  bordered(isBordered = true) {
+    this.is_bordered = Boolean(isBordered);
+    return this;
+  }
+  /**
+   * Set striped mode
+   * @param {boolean} [isStriped=true]
+   * @returns {this}
+   */
+  striped(isStriped = true) {
+    this.is_striped = Boolean(isStriped);
+    return this;
+  }
+  /**
+   * Add a row of cells
+   * @param {...any} cells
+   * @returns {this}
+   */
+  addRow(...cells) {
+    if (cells.length === 1 && Array.isArray(cells[0])) {
+      this.rows.push([...cells[0]]);
+    } else {
+      this.rows.push(cells.flat());
+    }
+    return this;
+  }
+  /**
+   * Convert table data into 2D array of RichBlockTableCell for Bot API 10.3
+   */
+  toCells() {
+    const cells = [];
+    if (this.headers.length > 0) {
+      cells.push(
+        this.headers.map((h, i) => ({
+          text: String(h ?? ""),
+          is_header: true,
+          align: this.alignments[i] || "center",
+          valign: "middle"
+        }))
+      );
+    }
+    for (const row of this.rows) {
+      cells.push(
+        row.map((cell, i) => {
+          if (cell && typeof cell === "object" && cell.text !== void 0) {
+            return {
+              align: this.alignments[i] || "left",
+              valign: "middle",
+              ...cell
+            };
+          }
+          return {
+            text: String(cell ?? ""),
+            align: this.alignments[i] || "left",
+            valign: "middle"
+          };
+        })
+      );
+    }
+    return cells;
+  }
+  /**
+   * Render table as SVG Card
+   * @param {object} [options]
+   * @returns {string}
+   */
+  toCardSvg(options = {}) {
+    const t = new Table({
+      headers: this.headers,
+      rows: this.rows,
+      col1Width: this.col1Width,
+      ...options
+    });
+    return t.toCardSvg(options);
+  }
+  /**
+   * Render HTML representation
+   */
+  toHtml(options = {}) {
+    const tableStr = Table.format(this.headers, this.rows, {
+      style: options.style || this.style,
+      isCompact: this.is_compact,
+      alignments: this.alignments,
+      ...options
+    });
+    const titleHtml = this.title ? `<b>${escapeHtml(this.title)}</b>
+
+` : "";
+    return `${titleHtml}<pre>${escapeHtml(tableStr)}</pre>`;
+  }
+  /**
+   * Convert to Bot API 10.3 JSON payload
+   */
+  toJSON() {
+    return {
+      type: "table",
+      is_bordered: this.is_bordered,
+      is_compact: this.is_compact,
+      is_striped: this.is_striped,
+      cells: this.toCells(),
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.headers.length > 0 ? { headers: this.headers } : {},
+      rows: this.rows,
+      ...this.title ? { title: this.title } : {}
+    };
+  }
+  static create(headers, rows, options) {
+    return new _InputRichBlockTable(headers, rows, options);
+  }
+};
+var RichBlockTable = InputRichBlockTable;
+
+// lib/ephemeral.js
+var EphemeralMessageParameters = class _EphemeralMessageParameters {
+  /**
+   * @param {object|number} [options={}]
+   * @param {number} [options.lifetime] - Message lifetime in seconds before disappearing
+   * @param {number} [options.lifetime_seconds] - Alias for lifetime
+   * @param {number} [options.receiver_user_id] - User identifier who sees the message
+   * @param {string} [options.callback_query_id] - Callback query identifier
+   * @param {boolean} [options.replace_callback_query_message=false] - Replace original callback message
+   */
+  constructor(options = {}) {
+    if (typeof options === "number") {
+      this.lifetime = options;
+      this.receiver_user_id = void 0;
+      this.callback_query_id = void 0;
+      this.replace_callback_query_message = false;
+    } else if (options && typeof options === "object") {
+      this.lifetime = options.lifetime ?? options.lifetime_seconds;
+      this.receiver_user_id = options.receiver_user_id ?? options.receiver;
+      this.callback_query_id = options.callback_query_id ?? options.callbackQueryId;
+      this.replace_callback_query_message = Boolean(
+        options.replace_callback_query_message ?? options.replaceMessage ?? false
+      );
+    }
+  }
+  /**
+   * Set lifetime in seconds
+   * @param {number} seconds
+   * @returns {this}
+   */
+  setLifetime(seconds) {
+    this.lifetime = seconds;
+    return this;
+  }
+  /**
+   * Set lifetime in seconds (fluent alias)
+   * @param {number} seconds
+   * @returns {this}
+   */
+  lifetime(seconds) {
+    this.lifetime = seconds;
+    return this;
+  }
+  /**
+   * Target specific receiver user ID
+   * @param {number|string} userId
+   * @returns {this}
+   */
+  receiver(userId) {
+    this.receiver_user_id = Number(userId);
+    return this;
+  }
+  /**
+   * Associate with callback query
+   * @param {string} queryId
+   * @returns {this}
+   */
+  callbackQuery(queryId) {
+    this.callback_query_id = String(queryId);
+    return this;
+  }
+  /**
+   * Allow bots to show an ephemeral message in place of the original message (Bot API 10.3)
+   * @param {boolean} [replace=true]
+   * @returns {this}
+   */
+  replaceCallbackQueryMessage(replace = true) {
+    this.replace_callback_query_message = Boolean(replace);
+    return this;
+  }
+  /**
+   * Convert to Telegram API payload JSON object
+   * @returns {object}
+   */
+  toJSON() {
+    const res = {};
+    if (this.lifetime !== void 0 && this.lifetime !== null) {
+      res.lifetime = Number(this.lifetime);
+    }
+    if (this.receiver_user_id !== void 0 && this.receiver_user_id !== null) {
+      res.receiver_user_id = Number(this.receiver_user_id);
+    }
+    if (this.callback_query_id !== void 0 && this.callback_query_id !== null) {
+      res.callback_query_id = String(this.callback_query_id);
+    }
+    if (this.replace_callback_query_message) {
+      res.replace_callback_query_message = true;
+    }
+    return res;
+  }
+  /**
+   * Factory method to create parameters
+   * @param {object|number} [options]
+   * @returns {EphemeralMessageParameters}
+   */
+  static create(options) {
+    return new _EphemeralMessageParameters(options);
+  }
+  /**
+   * Create ephemeral parameters replacing the callback query message
+   * @param {string} callbackQueryId
+   * @param {object} [options]
+   * @returns {EphemeralMessageParameters}
+   */
+  static replace(callbackQueryId, options = {}) {
+    return new _EphemeralMessageParameters({
+      callback_query_id: callbackQueryId,
+      replace_callback_query_message: true,
+      ...options
+    });
+  }
+  /**
+   * Create ephemeral parameters for a specific receiver user
+   * @param {number|string} userId
+   * @param {number} [lifetimeSeconds=60]
+   * @param {object} [options]
+   * @returns {EphemeralMessageParameters}
+   */
+  static forUser(userId, lifetimeSeconds = 60, options = {}) {
+    return new _EphemeralMessageParameters({
+      receiver_user_id: userId,
+      lifetime: lifetimeSeconds,
+      ...options
+    });
+  }
+};
+var ReplyParameters = class _ReplyParameters {
+  /**
+   * @param {number|object} [messageIdOrOptions]
+   * @param {number} [ephemeralMessageId]
+   */
+  constructor(messageIdOrOptions = {}, ephemeralMessageId) {
+    if (typeof messageIdOrOptions === "number") {
+      this.message_id = messageIdOrOptions;
+      if (ephemeralMessageId !== void 0) {
+        this.ephemeral_message_id = ephemeralMessageId;
+      }
+    } else if (messageIdOrOptions && typeof messageIdOrOptions === "object") {
+      this.message_id = messageIdOrOptions.message_id ?? messageIdOrOptions.messageId;
+      this.chat_id = messageIdOrOptions.chat_id ?? messageIdOrOptions.chatId;
+      this.allow_sending_without_reply = Boolean(
+        messageIdOrOptions.allow_sending_without_reply ?? messageIdOrOptions.allowSendingWithoutReply
+      );
+      this.quote = messageIdOrOptions.quote;
+      this.quote_parse_mode = messageIdOrOptions.quote_parse_mode ?? messageIdOrOptions.quoteParseMode;
+      this.quote_entities = messageIdOrOptions.quote_entities ?? messageIdOrOptions.quoteEntities;
+      this.quote_position = messageIdOrOptions.quote_position ?? messageIdOrOptions.quotePosition;
+      this.ephemeral_message_id = messageIdOrOptions.ephemeral_message_id ?? messageIdOrOptions.ephemeralMessageId ?? ephemeralMessageId;
+      this.checklist_task_id = messageIdOrOptions.checklist_task_id ?? messageIdOrOptions.checklistTaskId;
+      this.poll_option_id = messageIdOrOptions.poll_option_id ?? messageIdOrOptions.pollOptionId;
+      this.is_ephemeral = messageIdOrOptions.is_ephemeral ?? messageIdOrOptions.isEphemeral;
+    }
+  }
+  /**
+   * Set ephemeral message ID to reply to (Bot API 10.2)
+   * @param {number} id
+   * @returns {this}
+   */
+  setEphemeralMessageId(id) {
+    this.ephemeral_message_id = id;
+    return this;
+  }
+  /**
+   * Set ephemeral message ID (fluent alias)
+   * @param {number} id
+   * @returns {this}
+   */
+  ephemeralMessageId(id) {
+    return this.setEphemeralMessageId(id);
+  }
+  /**
+   * Set target message ID
+   * @param {number} id
+   * @returns {this}
+   */
+  messageId(id) {
+    this.message_id = id;
+    return this;
+  }
+  /**
+   * Set target chat ID
+   * @param {number|string} chatId
+   * @returns {this}
+   */
+  chatId(chatId) {
+    this.chat_id = chatId;
+    return this;
+  }
+  /**
+   * Allow sending without reply if original message is deleted
+   * @param {boolean} [allow=true]
+   * @returns {this}
+   */
+  allowWithoutReply(allow = true) {
+    this.allow_sending_without_reply = Boolean(allow);
+    return this;
+  }
+  /**
+   * Quote a part of the original message
+   * @param {string} text
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  quoteText(text, options = {}) {
+    this.quote = String(text);
+    if (options.parse_mode) this.quote_parse_mode = options.parse_mode;
+    if (options.position !== void 0) this.quote_position = options.position;
+    return this;
+  }
+  /**
+   * Convert to Telegram API payload JSON object
+   * @returns {object}
+   */
+  toJSON() {
+    const res = {};
+    if (this.message_id !== void 0 && this.message_id !== null) {
+      res.message_id = Number(this.message_id);
+    }
+    if (this.chat_id !== void 0 && this.chat_id !== null) {
+      res.chat_id = this.chat_id;
+    }
+    if (this.allow_sending_without_reply) {
+      res.allow_sending_without_reply = true;
+    }
+    if (this.quote !== void 0 && this.quote !== null) {
+      res.quote = String(this.quote);
+    }
+    if (this.quote_parse_mode) {
+      res.quote_parse_mode = this.quote_parse_mode;
+    }
+    if (this.quote_entities) {
+      res.quote_entities = this.quote_entities;
+    }
+    if (this.quote_position !== void 0 && this.quote_position !== null) {
+      res.quote_position = Number(this.quote_position);
+    }
+    if (this.ephemeral_message_id !== void 0 && this.ephemeral_message_id !== null) {
+      res.ephemeral_message_id = Number(this.ephemeral_message_id);
+    }
+    if (this.checklist_task_id !== void 0 && this.checklist_task_id !== null) {
+      res.checklist_task_id = Number(this.checklist_task_id);
+    }
+    if (this.poll_option_id !== void 0 && this.poll_option_id !== null) {
+      res.poll_option_id = this.poll_option_id;
+    }
+    if (this.is_ephemeral !== void 0 && this.is_ephemeral !== null) {
+      res.is_ephemeral = Boolean(this.is_ephemeral);
+    }
+    return res;
+  }
+  /**
+   * Static factory to reply to a standard message
+   * @param {number} messageId
+   * @param {object} [options]
+   * @returns {ReplyParameters}
+   */
+  static to(messageId, options = {}) {
+    return new _ReplyParameters({ message_id: messageId, ...options });
+  }
+  /**
+   * Static factory to reply to an ephemeral message (Bot API 10.2)
+   * @param {number} ephemeralMessageId
+   * @param {object} [options]
+   * @returns {ReplyParameters}
+   */
+  static ephemeral(ephemeralMessageId, options = {}) {
+    return new _ReplyParameters({ ephemeral_message_id: ephemeralMessageId, ...options });
+  }
+};
+var BotCommand = class _BotCommand {
+  /**
+   * @param {string} command - Text of the command; 1-32 characters
+   * @param {string} description - Description of the command; 1-256 characters
+   * @param {boolean} [is_ephemeral=false] - True, if the command should be ephemeral (Bot API 10.2)
+   */
+  constructor(command, description, is_ephemeral = false) {
+    this.command = String(command || "").replace(/^\//, "").toLowerCase();
+    this.description = String(description || "");
+    this.is_ephemeral = Boolean(is_ephemeral);
+  }
+  /**
+   * Mark command as ephemeral or not (Bot API 10.2)
+   * @param {boolean} [val=true]
+   * @returns {this}
+   */
+  ephemeral(val = true) {
+    this.is_ephemeral = Boolean(val);
+    return this;
+  }
+  toJSON() {
+    return {
+      command: this.command,
+      description: this.description,
+      ...this.is_ephemeral ? { is_ephemeral: true } : {}
+    };
+  }
+  /**
+   * Create a standard bot command
+   * @param {string} command
+   * @param {string} description
+   * @param {boolean} [is_ephemeral=false]
+   * @returns {BotCommand}
+   */
+  static create(command, description, is_ephemeral = false) {
+    return new _BotCommand(command, description, is_ephemeral);
+  }
+  /**
+   * Create an ephemeral bot command (Bot API 10.2)
+   * @param {string} command
+   * @param {string} description
+   * @returns {BotCommand}
+   */
+  static ephemeral(command, description) {
+    return new _BotCommand(command, description, true);
+  }
+};
+
 // lib/api.js
 var import_node_fs = __toESM(require("node:fs"), 1);
 var import_node_path = __toESM(require("node:path"), 1);
 function isUploadableFile(value, key = "") {
   if (!value) return false;
   if (typeof value === "string") return false;
-  if (key === "link_preview_options" || key === "reply_parameters" || key === "reply_markup") {
+  if (key === "link_preview_options" || key === "reply_parameters" || key === "reply_markup" || key === "ephemeral_message_parameters" || key === "ephemeral_parameters" || key === "blocks" || key === "media") {
     return false;
   }
   if (value instanceof Blob || value instanceof Uint8Array || Buffer.isBuffer(value)) return true;
@@ -841,6 +2337,53 @@ function normalizeTelegramPayload(payload) {
     norm.link_preview_options = { is_disabled: Boolean(norm.disable_web_page_preview) };
     delete norm.disable_web_page_preview;
   }
+  if (norm.reply_parameters && typeof norm.reply_parameters.toJSON === "function") {
+    norm.reply_parameters = norm.reply_parameters.toJSON();
+  }
+  if (!norm.reply_parameters) {
+    if (norm.ephemeral_message_id !== void 0 && norm.reply_to_message_id === void 0) {
+      norm.reply_parameters = {
+        ephemeral_message_id: Number(norm.ephemeral_message_id),
+        ...norm.allow_sending_without_reply !== void 0 ? { allow_sending_without_reply: Boolean(norm.allow_sending_without_reply) } : {}
+      };
+      delete norm.ephemeral_message_id;
+      delete norm.allow_sending_without_reply;
+    } else if (norm.reply_to_message_id !== void 0) {
+      norm.reply_parameters = {
+        message_id: Number(norm.reply_to_message_id),
+        ...norm.allow_sending_without_reply !== void 0 ? { allow_sending_without_reply: Boolean(norm.allow_sending_without_reply) } : {},
+        ...norm.ephemeral_message_id !== void 0 ? { ephemeral_message_id: Number(norm.ephemeral_message_id) } : {}
+      };
+      delete norm.reply_to_message_id;
+      delete norm.allow_sending_without_reply;
+      delete norm.ephemeral_message_id;
+    }
+  } else if (norm.reply_parameters && typeof norm.reply_parameters === "object") {
+    if (norm.ephemeral_message_id !== void 0 && norm.reply_parameters.ephemeral_message_id === void 0) {
+      norm.reply_parameters.ephemeral_message_id = Number(norm.ephemeral_message_id);
+      delete norm.ephemeral_message_id;
+    }
+  }
+  if (norm.ephemeral_message_parameters) {
+    if (typeof norm.ephemeral_message_parameters.toJSON === "function") {
+      norm.ephemeral_message_parameters = norm.ephemeral_message_parameters.toJSON();
+    } else if (typeof norm.ephemeral_message_parameters === "number") {
+      norm.ephemeral_message_parameters = { lifetime: norm.ephemeral_message_parameters };
+    }
+  } else if (norm.ephemeral_parameters) {
+    if (typeof norm.ephemeral_parameters.toJSON === "function") {
+      norm.ephemeral_message_parameters = norm.ephemeral_parameters.toJSON();
+    } else if (typeof norm.ephemeral_parameters === "number") {
+      norm.ephemeral_message_parameters = { lifetime: norm.ephemeral_parameters };
+    } else {
+      norm.ephemeral_message_parameters = { ...norm.ephemeral_parameters };
+    }
+  } else if (norm.receiver_user_id !== void 0 || norm.callback_query_id !== void 0) {
+    norm.ephemeral_message_parameters = {
+      ...norm.receiver_user_id !== void 0 ? { receiver_user_id: norm.receiver_user_id } : {},
+      ...norm.callback_query_id !== void 0 ? { callback_query_id: norm.callback_query_id } : {}
+    };
+  }
   return norm;
 }
 var Telegram = class {
@@ -891,6 +2434,12 @@ var Telegram = class {
         hasUpload = true;
         break;
       }
+      if (key === "media" && normalizedPayload[key] && typeof normalizedPayload[key] === "object") {
+        if (isUploadableFile(normalizedPayload[key].media, "media")) {
+          hasUpload = true;
+          break;
+        }
+      }
     }
     let requestInit = {
       method: "POST",
@@ -900,7 +2449,17 @@ var Telegram = class {
       const formData = new FormData();
       for (const [key, value] of Object.entries(normalizedPayload)) {
         if (value === void 0 || value === null) continue;
-        if (isUploadableFile(value, key)) {
+        if (key === "media" && typeof value === "object" && value.media && isUploadableFile(value.media, "media")) {
+          const { blob, filename } = await normalizeFileSource(value.media, "media");
+          const attachName = `media_file_${Date.now()}`;
+          if (typeof blob === "string") {
+            formData.append(attachName, blob);
+          } else {
+            formData.append(attachName, blob, filename || "file");
+          }
+          const mediaObj = { ...value, media: `attach://${attachName}` };
+          formData.append("media", JSON.stringify(mediaObj));
+        } else if (isUploadableFile(value, key)) {
           const { blob, filename } = await normalizeFileSource(value, key);
           if (typeof blob === "string") {
             formData.append(key, blob);
@@ -1046,6 +2605,21 @@ var Telegram = class {
    */
   sendPhoto(chatId, photo, extra = {}) {
     return this.call("sendPhoto", { chat_id: chatId, photo, ...extra });
+  }
+  /**
+   * Send a live photo (photo with short video - Bot API 10.2+)
+   * @param {number|string} chatId
+   * @param {any} photo - Photo file_id, URL, or input file
+   * @param {any} video - Video loop file_id, URL, or input file (max 10s, 10MB)
+   * @param {object} [extra] - Extra parameters (receiver_user_id, callback_query_id, caption, etc.)
+   */
+  sendLivePhoto(chatId, photo, video, extra = {}) {
+    return this.call("sendLivePhoto", {
+      chat_id: chatId,
+      photo,
+      video,
+      ...extra
+    });
   }
   /**
    * Send audio
@@ -1485,7 +3059,8 @@ var Telegram = class {
    * Bot commands and metadata
    */
   setMyCommands(commands, extra = {}) {
-    return this.call("setMyCommands", { commands, ...extra });
+    const serialized = Array.isArray(commands) ? commands.map((cmd) => typeof cmd?.toJSON === "function" ? cmd.toJSON() : cmd) : commands;
+    return this.call("setMyCommands", { commands: serialized, ...extra });
   }
   deleteMyCommands(extra = {}) {
     return this.call("deleteMyCommands", extra);
@@ -2119,9 +3694,9 @@ var Telegram = class {
     });
   }
   /**
-   * Send an ephemeral message
+   * Send an ephemeral message (Bot API 10.3 EphemeralMessageParameters)
    * @param {number|string} chatId
-   * @param {string} text
+   * @param {string|object} text
    * @param {object|number} [ephemeralParameters={}]
    * @param {object} [extra={}]
    */
@@ -2129,17 +3704,28 @@ var Telegram = class {
     let params = ephemeralParameters;
     if (typeof ephemeralParameters === "number") {
       params = { lifetime: ephemeralParameters };
+    } else if (ephemeralParameters && typeof ephemeralParameters.toJSON === "function") {
+      params = ephemeralParameters.toJSON();
     }
     const payload = {
       chat_id: chatId,
-      text,
-      ...params && typeof params === "object" ? { ephemeral_parameters: params } : {},
+      text: typeof text === "string" ? text : text?.text || String(text),
+      ...params && typeof params === "object" ? {
+        ephemeral_message_parameters: params,
+        ephemeral_parameters: params
+      } : {},
       ...extra
     };
+    if (text && typeof text === "object" && (text.blocks || typeof text.compile === "function")) {
+      const compiled = typeof text.compile === "function" ? text.compile() : text;
+      payload.text = compiled.text;
+      if (compiled.blocks) payload.blocks = compiled.blocks;
+      if (compiled.reply_markup && !payload.reply_markup) payload.reply_markup = compiled.reply_markup;
+    }
     const autoDeleteSeconds = params?.autoDeleteSeconds || params?.lifetime || (typeof ephemeralParameters === "number" ? ephemeralParameters : null);
     return this.call("sendEphemeralMessage", payload).catch(async (err) => {
       if (err.errorCode === 404 || err.description?.includes("Method not found") || err.description?.includes("Unknown method") || err.description?.includes("Bad Request")) {
-        const msg = await this.sendMessage(chatId, text, extra);
+        const msg = await this.sendMessage(chatId, payload.text, extra);
         if (autoDeleteSeconds && msg?.message_id) {
           setTimeout(() => {
             this.deleteMessage(chatId, msg.message_id).catch(() => {
@@ -2152,22 +3738,148 @@ var Telegram = class {
     });
   }
   /**
-   * Edit ephemeral message text
+   * Send a formatted table to a chat (HTML Table or Native Bot API 10.3 Card)
    * @param {number|string} chatId
-   * @param {number} messageId
-   * @param {string} text
-   * @param {object} [extra]
+   * @param {Array<string>|Table|InputRichBlockTable} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
    */
-  editEphemeralMessageText(chatId, messageId, text, extra = {}) {
-    return this.call("editEphemeralMessageText", {
-      chat_id: chatId,
-      message_id: messageId,
-      text,
-      ...extra
+  sendTable(chatId, headersOrTable, rows = [], options = {}) {
+    if (options.rich === true || options.card === true || options.style === "card" || options.native === true) {
+      return this.sendRichTable(chatId, headersOrTable, rows, options);
+    }
+    let tableHtml;
+    if (headersOrTable instanceof Table || headersOrTable && typeof headersOrTable.toHtml === "function") {
+      tableHtml = headersOrTable.toHtml(options);
+    } else {
+      tableHtml = Table.html(headersOrTable, rows, options);
+    }
+    return this.sendMessage(chatId, tableHtml, {
+      parse_mode: "HTML",
+      ...options
     });
   }
   /**
-   * Edit ephemeral message media
+   * Send a native Bot API 10.3 Rich Message Table (renders modern card table UI)
+   * @param {number|string} chatId
+   * @param {Array<string>|Table|InputRichBlockTable|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  sendRichTable(chatId, headersOrTable, rows = [], options = {}) {
+    let block;
+    if (headersOrTable instanceof InputRichBlockTable) {
+      block = headersOrTable;
+    } else if (headersOrTable instanceof Table) {
+      block = new InputRichBlockTable(headersOrTable.headers, headersOrTable.rows, {
+        is_compact: headersOrTable.is_compact,
+        is_bordered: headersOrTable.is_bordered,
+        is_striped: headersOrTable.is_striped,
+        caption: headersOrTable.caption,
+        alignments: headersOrTable._alignments,
+        title: headersOrTable._title,
+        col1Width: headersOrTable.col1Width,
+        ...options
+      });
+    } else if (headersOrTable && typeof headersOrTable === "object" && !Array.isArray(headersOrTable)) {
+      block = new InputRichBlockTable(headersOrTable);
+    } else {
+      block = new InputRichBlockTable(headersOrTable, rows, { is_bordered: true, ...options });
+    }
+    const titleText = options.title || block.title || "";
+    const caption = options.caption || block.caption || "";
+    const headerPrefix = titleText ? `<b>${titleText}</b>
+
+` : "";
+    const footerSuffix = caption ? `
+
+<i>${caption}</i>` : "";
+    return this.sendRichMessage(chatId, {
+      text: `${headerPrefix}${block.toHtml()}${footerSuffix}`,
+      parse_mode: "HTML",
+      blocks: [block.toJSON()]
+    }, options);
+  }
+  /**
+   * Send a Card Table to a chat (as Rich Block or styled SVG Card Image)
+   * @param {number|string} chatId
+   * @param {Array<string>|Table} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  sendTableCard(chatId, headersOrTable, rows = [], options = {}) {
+    if (options.asImage || options.photo || options.image) {
+      const table = headersOrTable instanceof Table ? headersOrTable : new Table(headersOrTable, rows, options);
+      const svgBuffer = table.toBuffer(options);
+      return this.sendPhoto(chatId, {
+        source: svgBuffer,
+        filename: "table-card.svg"
+      }, {
+        caption: options.caption || options.title || "",
+        parse_mode: options.parse_mode || "HTML",
+        ...options
+      });
+    }
+    return this.sendRichTable(chatId, headersOrTable, rows, { is_bordered: true, ...options });
+  }
+  /**
+   * Send multiple stacked card tables (e.g. SYSTEM and PROFILE cards)
+   * @param {number|string} chatId
+   * @param {Array<Table|object>} tables
+   * @param {object} [options={}]
+   */
+  sendCardTables(chatId, tables, options = {}) {
+    if (options.asImage || options.photo || options.image) {
+      const svg = Table.multiCardSvg(tables, options);
+      const buffer = Buffer.from(svg, "utf-8");
+      return this.sendPhoto(chatId, {
+        source: buffer,
+        filename: "tables-cards.svg"
+      }, {
+        caption: options.caption || "",
+        parse_mode: options.parse_mode || "HTML",
+        ...options
+      });
+    }
+    const list = Array.isArray(tables) ? tables : [tables];
+    const blocks = list.map((t) => {
+      const tableInst = t instanceof Table ? t : t instanceof InputRichBlockTable ? t : new Table(t);
+      return tableInst.toRichBlock ? tableInst.toRichBlock() : tableInst.toJSON();
+    });
+    const htmlParts = list.map((t) => {
+      if (typeof t?.toHtml === "function") return t.toHtml();
+      return new Table(t).toHtml();
+    });
+    return this.sendRichMessage(chatId, {
+      text: htmlParts.join("\n\n"),
+      parse_mode: "HTML",
+      blocks
+    }, options);
+  }
+  /**
+   * Edit ephemeral message text (Bot API 10.3 supports rich_message)
+   * @param {number|string} chatId
+   * @param {number} messageId
+   * @param {string|object} text
+   * @param {object} [extra]
+   */
+  editEphemeralMessageText(chatId, messageId, text, extra = {}) {
+    const payload = {
+      chat_id: chatId,
+      message_id: messageId,
+      ...extra
+    };
+    if (extra.rich_message) {
+      payload.rich_message = typeof extra.rich_message.toJSON === "function" ? extra.rich_message.toJSON() : extra.rich_message;
+    } else if (text && typeof text === "object" && (text.blocks || typeof text.compile === "function" || typeof text.toJSON === "function")) {
+      payload.rich_message = typeof text.compile === "function" ? text.compile() : typeof text.toJSON === "function" ? text.toJSON() : text;
+    } else {
+      payload.text = String(text);
+    }
+    return this.call("editEphemeralMessageText", payload);
+  }
+  /**
+   * Edit ephemeral message media (Bot API 10.3 supports file upload)
    * @param {number|string} chatId
    * @param {number} messageId
    * @param {object} media
@@ -2182,19 +3894,23 @@ var Telegram = class {
     });
   }
   /**
-   * Edit ephemeral message caption
+   * Edit ephemeral message caption (Bot API 10.3 supports show_caption_above_media)
    * @param {number|string} chatId
    * @param {number} messageId
    * @param {string} caption
    * @param {object} [extra]
    */
   editEphemeralMessageCaption(chatId, messageId, caption, extra = {}) {
-    return this.call("editEphemeralMessageCaption", {
+    const payload = {
       chat_id: chatId,
       message_id: messageId,
       caption,
       ...extra
-    });
+    };
+    if (extra.show_caption_above_media !== void 0) {
+      payload.show_caption_above_media = Boolean(extra.show_caption_above_media);
+    }
+    return this.call("editEphemeralMessageCaption", payload);
   }
   /**
    * Delete an ephemeral message
@@ -2397,7 +4113,16 @@ function serializeMessage(msg) {
   } else if (msg.poll) {
     serialized.type = "poll";
     serialized.poll = msg.poll;
+  } else if (msg.live_photo) {
+    serialized.type = "live_photo";
+    serialized.media = msg.live_photo;
   }
+  serialized.receiver_user = msg.receiver_user || null;
+  serialized.receiverUser = msg.receiver_user || null;
+  serialized.ephemeral_message_id = msg.ephemeral_message_id || null;
+  serialized.ephemeralMessageId = msg.ephemeral_message_id || null;
+  serialized.is_ephemeral = Boolean(msg.ephemeral_message_id || msg.receiver_user);
+  serialized.isEphemeral = Boolean(msg.ephemeral_message_id || msg.receiver_user);
   if (msg.reply_to_message) {
     serialized.quoted = serializeMessage(msg.reply_to_message);
   }
@@ -2434,90 +4159,6 @@ function serializeUpdate(update) {
   else if (update.paid_message_price_changed) result.type = "paid_message_price_changed";
   return result;
 }
-
-// lib/format.js
-function escapeHtml(text) {
-  if (text === null || text === void 0) return "";
-  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-function escapeMarkdown(text) {
-  if (text === null || text === void 0) return "";
-  return String(text).replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
-}
-var html = {
-  escape: escapeHtml,
-  bold: (text) => `<b>${escapeHtml(text)}</b>`,
-  italic: (text) => `<i>${escapeHtml(text)}</i>`,
-  underline: (text) => `<u>${escapeHtml(text)}</u>`,
-  strikethrough: (text) => `<s>${escapeHtml(text)}</s>`,
-  spoiler: (text) => `<span class="tg-spoiler">${escapeHtml(text)}</span>`,
-  code: (text) => `<code>${escapeHtml(text)}</code>`,
-  pre: (codeText, language = "") => {
-    const langAttr = language ? ` class="language-${escapeHtml(language)}"` : "";
-    return `<pre><code${langAttr}>${escapeHtml(codeText)}</code></pre>`;
-  },
-  link: (text, url) => `<a href="${escapeHtml(url)}">${escapeHtml(text)}</a>`,
-  mention: (text, userId) => `<a href="tg://user?id=${userId}">${escapeHtml(text)}</a>`,
-  customEmoji: (text, customEmojiId) => `<tg-emoji emoji-id="${customEmojiId}">${escapeHtml(text)}</tg-emoji>`,
-  quote: (text) => `<blockquote>${escapeHtml(text)}</blockquote>`,
-  expandableBlockquote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`,
-  expandableQuote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`,
-  collapsibleQuote: (text) => `<blockquote expandable>${escapeHtml(text)}</blockquote>`
-};
-var markdown = {
-  escape: escapeMarkdown,
-  bold: (text) => `*${escapeMarkdown(text)}*`,
-  italic: (text) => `_${escapeMarkdown(text)}_`,
-  underline: (text) => `__${escapeMarkdown(text)}__`,
-  strikethrough: (text) => `~${escapeMarkdown(text)}~`,
-  spoiler: (text) => `||${escapeMarkdown(text)}||`,
-  code: (text) => `\`${escapeMarkdown(text)}\``,
-  pre: (codeText, language = "") => `\`\`\`${language}
-${codeText.replace(/\\/g, "\\\\").replace(/`/g, "\\`")}
-\`\`\``,
-  link: (text, url) => `[${escapeMarkdown(text)}](${url.replace(/([)\\])/g, "\\$1")})`,
-  mention: (text, userId) => `[${escapeMarkdown(text)}](tg://user?id=${userId})`,
-  customEmoji: (text, customEmojiId) => `![${escapeMarkdown(text)}](tg://emoji?id=${customEmojiId})`,
-  quote: (text) => text.split("\n").map((line) => `>${escapeMarkdown(line)}`).join("\n"),
-  expandableBlockquote: (text) => `**>${escapeMarkdown(text)}||`,
-  expandableQuote: (text) => `**>${escapeMarkdown(text)}||`,
-  collapsibleQuote: (text) => `**>${escapeMarkdown(text)}||`
-};
-function fmt(strings, ...values) {
-  let result = "";
-  for (let i = 0; i < strings.length; i++) {
-    result += strings[i];
-    if (i < values.length) {
-      const val = values[i];
-      if (val === null || val === void 0) {
-      } else if (typeof val === "object" && val.rawHtml) {
-        result += val.rawHtml;
-      } else {
-        result += escapeHtml(String(val));
-      }
-    }
-  }
-  return result;
-}
-fmt.bold = html.bold;
-fmt.italic = html.italic;
-fmt.underline = html.underline;
-fmt.strikethrough = html.strikethrough;
-fmt.spoiler = html.spoiler;
-fmt.code = html.code;
-fmt.pre = html.pre;
-fmt.link = html.link;
-fmt.mention = html.mention;
-fmt.customEmoji = html.customEmoji;
-fmt.quote = html.quote;
-fmt.expandableBlockquote = html.expandableBlockquote;
-fmt.expandableQuote = html.expandableQuote;
-fmt.collapsibleQuote = html.collapsibleQuote;
-fmt.escape = escapeHtml;
-fmt.html = html;
-fmt.markdown = markdown;
-fmt.raw = (str) => ({ rawHtml: String(str) });
-var Format = fmt;
 
 // lib/webapp.js
 var import_crypto = __toESM(require("crypto"), 1);
@@ -3533,6 +5174,15 @@ var Context = class {
     return this.telegram.sendMediaGroup(this._assertChat(), media, extra);
   }
   /**
+   * Send live photo (Bot API 10.2+)
+   * @param {any} photo - Photo file / file_id / url / Buffer / Stream
+   * @param {any} video - Paired video file / file_id / url / Buffer / Stream
+   * @param {object} [extra]
+   */
+  replyWithLivePhoto(photo, video, extra = {}) {
+    return this.telegram.sendLivePhoto(this._assertChat(), photo, video, extra);
+  }
+  /**
    * Send location coordinates
    * @param {number} latitude
    * @param {number} longitude
@@ -3963,12 +5613,179 @@ var Context = class {
   }
   /**
    * Send an ephemeral message
-   * @param {string} text
-   * @param {object} ephemeralParameters
+   * @param {string|object} text
+   * @param {object|number} [ephemeralParameters]
    * @param {object} [extra]
    */
   sendEphemeralMessage(text, ephemeralParameters, extra = {}) {
     return this.telegram.sendEphemeralMessage(this._assertChat(), text, ephemeralParameters, extra);
+  }
+  /**
+   * Reply with an ephemeral message
+   * @param {string|object} text
+   * @param {object|number} [ephemeralParameters]
+   * @param {object} [extra]
+   */
+  replyEphemeral(text, ephemeralParameters, extra = {}) {
+    return this.sendEphemeralMessage(text, ephemeralParameters, extra);
+  }
+  /**
+   * Reply with a formatted table (Bot API 10.3 / HTML Table)
+   * @param {Array<string>|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  replyWithTable(headersOrTable, rows = [], options = {}) {
+    return this.telegram.sendTable(this._assertChat(), headersOrTable, rows, options);
+  }
+  /**
+   * Reply with a formatted table (alias)
+   */
+  replyTable(headersOrTable, rows = [], options = {}) {
+    return this.replyWithTable(headersOrTable, rows, options);
+  }
+  /**
+   * Reply with a native Bot API 10.3 Rich Message Table
+   * @param {Array<string>|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  replyWithRichTable(headersOrTable, rows = [], options = {}) {
+    return this.telegram.sendRichTable(this._assertChat(), headersOrTable, rows, options);
+  }
+  /**
+   * Reply with a modern Telegram Card Table (matching bot UI with rounded container and grid lines)
+   * @param {Array<string>|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   */
+  replyWithTableCard(headersOrTable, rows = [], options = {}) {
+    return this.telegram.sendTableCard(this._assertChat(), headersOrTable, rows, options);
+  }
+  /**
+   * Reply with multiple stacked card tables (e.g. SYSTEM and PROFILE cards)
+   * @param {Array<object>} tables
+   * @param {object} [options={}]
+   */
+  replyWithCardTables(tables, options = {}) {
+    return this.telegram.sendCardTables(this._assertChat(), tables, options);
+  }
+  /**
+   * Reply with System Status Card (matching Telegram bot screenshot)
+   * All fields, labels, titles, and values are fully customizable
+   * @param {object|Array<Array<any>>} [data={}] - Custom status fields or rows matrix
+   * @param {object} [options={}] - Options including title, subtitle, asImage, etc.
+   */
+  replyWithSystemStatus(data = {}, options = {}) {
+    const title = options.title || data.title || options.header || "\u{1F916} SYSTEM";
+    const subtitle = options.subtitle || data.subtitle || options.subHeader || "Status";
+    let rows;
+    if (Array.isArray(data)) {
+      rows = data;
+    } else if (data.rows && Array.isArray(data.rows)) {
+      rows = data.rows;
+    } else if (data.fields && Array.isArray(data.fields)) {
+      rows = data.fields;
+    } else {
+      const keys = Object.keys(data).filter(
+        (k) => !["title", "subtitle", "header", "subHeader", "rows", "fields"].includes(k)
+      );
+      if (keys.length > 0) {
+        rows = keys.map((key) => {
+          const formattedLabel = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          return [formattedLabel, data[key]];
+        });
+      } else {
+        rows = [
+          ["Engine", data.engine || "Telegix"],
+          ["Runtime", data.runtime || "0h 19m 32s"],
+          ["Node", data.node || process.version || "v23.11"],
+          ["Features", data.features ?? 514],
+          ["Groups", data.groups ?? 168],
+          ["Users", data.users ?? 9528]
+        ];
+      }
+    }
+    return this.replyWithTableCard([title, subtitle], rows, {
+      title,
+      ...options
+    });
+  }
+  /**
+   * Reply with User Profile Card (matching Telegram bot screenshot)
+   * All fields, labels, titles, and values are fully customizable
+   * @param {object|Array<Array<any>>} [data={}] - Custom profile fields or rows matrix
+   * @param {object} [options={}] - Options including title, subtitle, asImage, etc.
+   */
+  replyWithUserProfile(data = {}, options = {}) {
+    const title = options.title || data.title || options.header || "\u{1F464} PROFILE";
+    const subtitle = options.subtitle || data.subtitle || options.subHeader || "Info";
+    let rows;
+    if (Array.isArray(data)) {
+      rows = data;
+    } else if (data.rows && Array.isArray(data.rows)) {
+      rows = data.rows;
+    } else if (data.fields && Array.isArray(data.fields)) {
+      rows = data.fields;
+    } else {
+      const keys = Object.keys(data).filter(
+        (k) => !["title", "subtitle", "header", "subHeader", "rows", "fields"].includes(k)
+      );
+      if (keys.length > 0) {
+        rows = keys.map((key) => {
+          const formattedLabel = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          return [formattedLabel, data[key]];
+        });
+      } else {
+        const username = data.username || (this.from?.username ? `@${this.from.username}` : "@seventynn");
+        rows = [
+          ["Username", username],
+          ["Status", data.status || "Free User"],
+          ["Limit", data.limit ?? 0],
+          ["Points", data.points ?? 0],
+          ["Time", data.time || "Selasa, 8 September 2026"]
+        ];
+      }
+    }
+    return this.replyWithTableCard([title, subtitle], rows, {
+      title,
+      ...options
+    });
+  }
+  /**
+   * Edit ephemeral message text
+   * @param {string|object} text
+   * @param {object} [extra]
+   */
+  editEphemeralMessageText(text, extra = {}) {
+    const msgId = this._assertMessage();
+    return this.telegram.editEphemeralMessageText(this._assertChat(), msgId, text, extra);
+  }
+  /**
+   * Edit ephemeral message media
+   * @param {object} media
+   * @param {object} [extra]
+   */
+  editEphemeralMessageMedia(media, extra = {}) {
+    const msgId = this._assertMessage();
+    return this.telegram.editEphemeralMessageMedia(this._assertChat(), msgId, media, extra);
+  }
+  /**
+   * Edit ephemeral message caption
+   * @param {string} caption
+   * @param {object} [extra]
+   */
+  editEphemeralMessageCaption(caption, extra = {}) {
+    const msgId = this._assertMessage();
+    return this.telegram.editEphemeralMessageCaption(this._assertChat(), msgId, caption, extra);
+  }
+  /**
+   * Delete an ephemeral message
+   * @param {number} [messageId]
+   */
+  deleteEphemeralMessage(messageId) {
+    const msgId = messageId || this._assertMessage();
+    return this.telegram.deleteEphemeralMessage(this._assertChat(), msgId);
   }
   /**
    * Get user personal chat messages
@@ -4907,6 +6724,1078 @@ function session(options = {}) {
 }
 
 // lib/rich.js
+var RichMessageButton = class _RichMessageButton {
+  /**
+   * @param {string} text
+   * @param {object} [options]
+   */
+  constructor(text, options = {}) {
+    this.text = String(text);
+    this.options = options;
+  }
+  /**
+   * Convert to Telegram button object
+   */
+  toJSON() {
+    return {
+      text: this.text,
+      ...this.options
+    };
+  }
+  static url(text, url) {
+    return new _RichMessageButton(text, { url });
+  }
+  static callback(text, data) {
+    return new _RichMessageButton(text, { callback_data: String(data) });
+  }
+  static copyText(text, copyText) {
+    return new _RichMessageButton(text, { copy_text: { text: String(copyText) } });
+  }
+  static webApp(text, url) {
+    return new _RichMessageButton(text, { web_app: { url } });
+  }
+  static primary(text, dataOrUrl, options = {}) {
+    return new _RichMessageButton(text, {
+      style: "primary",
+      ..._RichMessageButton._resolveDataOrUrl(dataOrUrl),
+      ...options
+    });
+  }
+  static danger(text, dataOrUrl, options = {}) {
+    return new _RichMessageButton(text, {
+      style: "danger",
+      ..._RichMessageButton._resolveDataOrUrl(dataOrUrl),
+      ...options
+    });
+  }
+  static success(text, dataOrUrl, options = {}) {
+    return new _RichMessageButton(text, {
+      style: "success",
+      ..._RichMessageButton._resolveDataOrUrl(dataOrUrl),
+      ...options
+    });
+  }
+  static colored(text, style, dataOrUrl, options = {}) {
+    return new _RichMessageButton(text, {
+      style,
+      ..._RichMessageButton._resolveDataOrUrl(dataOrUrl),
+      ...options
+    });
+  }
+  static disabled(text) {
+    return new _RichMessageButton(text, { disabled: true });
+  }
+  static document(text, documentId) {
+    return new _RichMessageButton(text, { url: `tg://document?id=${documentId}` });
+  }
+  static _resolveDataOrUrl(dataOrUrl) {
+    if (!dataOrUrl) return {};
+    if (typeof dataOrUrl === "string") {
+      if (/^(https?:\/\/|tg:\/\/)/i.test(dataOrUrl)) {
+        return { url: dataOrUrl };
+      }
+      return { callback_data: dataOrUrl };
+    }
+    if (typeof dataOrUrl === "number") {
+      return { callback_data: String(dataOrUrl) };
+    }
+    if (typeof dataOrUrl === "object") {
+      return dataOrUrl;
+    }
+    return {};
+  }
+};
+var RichTextButton = class _RichTextButton {
+  /**
+   * @param {string} text
+   * @param {object} [options]
+   */
+  constructor(text, options = {}) {
+    this.text = String(text);
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "rich_text_button",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    if (this.options.url) {
+      return `<a href="${escapeHtml(this.options.url)}">${escapeHtml(this.text)}</a>`;
+    }
+    if (this.options.callback_data) {
+      return `<b>[${escapeHtml(this.text)}]</b>`;
+    }
+    return escapeHtml(this.text);
+  }
+  static url(text, url) {
+    return new _RichTextButton(text, { url });
+  }
+  static callback(text, data) {
+    return new _RichTextButton(text, { callback_data: String(data) });
+  }
+  static document(text, documentId) {
+    return new _RichTextButton(text, { url: `tg://document?id=${documentId}` });
+  }
+  static user(text, userId) {
+    return new _RichTextButton(text, { url: `tg://user?id=${userId}` });
+  }
+};
+var InputRichBlockButtons = class _InputRichBlockButtons {
+  /**
+   * @param {Array<Array<object>>|Array<object>} [buttons=[]]
+   */
+  constructor(buttons = []) {
+    this.type = "buttons";
+    this.buttons = Array.isArray(buttons) ? buttons : [buttons];
+  }
+  addRow(...buttons) {
+    this.buttons.push(buttons.flat());
+    return this;
+  }
+  addButton(button) {
+    if (this.buttons.length === 0) {
+      this.buttons.push([button]);
+    } else {
+      this.buttons[this.buttons.length - 1].push(button);
+    }
+    return this;
+  }
+  toJSON() {
+    return {
+      type: "buttons",
+      buttons: this.buttons.map(
+        (row) => Array.isArray(row) ? row.map((btn) => typeof btn?.toJSON === "function" ? btn.toJSON() : btn) : typeof row?.toJSON === "function" ? row.toJSON() : row
+      )
+    };
+  }
+  toHtml() {
+    const lines = [];
+    for (const row of this.buttons) {
+      if (Array.isArray(row)) {
+        const rowTexts = row.map((btn) => {
+          const text = btn.text || String(btn);
+          if (btn.url) {
+            return `<a href="${escapeHtml(btn.url)}">${escapeHtml(text)}</a>`;
+          }
+          return `[${escapeHtml(text)}]`;
+        });
+        lines.push(rowTexts.join("  "));
+      }
+    }
+    return lines.join("\n");
+  }
+  static create(buttons) {
+    return new _InputRichBlockButtons(buttons);
+  }
+};
+var RichBlockButtons = InputRichBlockButtons;
+var InputRichBlockExpandableBlockQuotation = class _InputRichBlockExpandableBlockQuotation {
+  /**
+   * @param {string} text
+   * @param {object} [options]
+   */
+  constructor(text, options = {}) {
+    this.type = "expandable_block_quotation";
+    this.text = String(text || "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "expandable_block_quotation",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<blockquote expandable>${escapeHtml(this.text)}</blockquote>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockExpandableBlockQuotation(text, options);
+  }
+};
+var RichBlockExpandableBlockQuotation = InputRichBlockExpandableBlockQuotation;
+var InputRichBlockDocument = class _InputRichBlockDocument {
+  /**
+   * @param {string|object} document
+   * @param {string} [caption='']
+   * @param {object} [options={}]
+   */
+  constructor(document, caption = "", options = {}) {
+    this.type = "document";
+    this.document = document;
+    this.caption = String(caption || "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "document",
+      document: this.document,
+      caption: this.caption,
+      ...this.options
+    };
+  }
+  toHtml() {
+    if (typeof this.document === "string" && this.document.startsWith("tg://")) {
+      return `<a href="${escapeHtml(this.document)}">\u{1F4C4} ${escapeHtml(this.caption || "Document")}</a>`;
+    }
+    return `\u{1F4C4} <b>Document:</b> ${escapeHtml(this.caption || String(this.document))}`;
+  }
+  static create(document, caption, options) {
+    return new _InputRichBlockDocument(document, caption, options);
+  }
+};
+var RichBlockDocument = InputRichBlockDocument;
+var InputRichBlockParagraph = class _InputRichBlockParagraph {
+  /**
+   * @param {string} text
+   * @param {object} [options={}]
+   */
+  constructor(text, options = {}) {
+    this.type = "paragraph";
+    this.text = String(text ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "paragraph",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<p>${escapeHtml(this.text)}</p>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockParagraph(text, options);
+  }
+};
+var RichBlockParagraph = InputRichBlockParagraph;
+var InputRichBlockSectionHeading = class _InputRichBlockSectionHeading {
+  /**
+   * @param {string} text
+   * @param {number} [level=2]
+   * @param {object} [options={}]
+   */
+  constructor(text, level = 2, options = {}) {
+    this.type = "section_heading";
+    this.text = String(text ?? "");
+    this.level = Math.max(1, Math.min(6, Number(level) || 2));
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "section_heading",
+      text: this.text,
+      level: this.level,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<b>${escapeHtml(this.text)}</b>`;
+  }
+  static create(text, level, options) {
+    return new _InputRichBlockSectionHeading(text, level, options);
+  }
+};
+var RichBlockSectionHeading = InputRichBlockSectionHeading;
+var InputRichBlockPreformatted = class _InputRichBlockPreformatted {
+  /**
+   * @param {string} text
+   * @param {string} [language='']
+   * @param {object} [options={}]
+   */
+  constructor(text, language = "", options = {}) {
+    this.type = "preformatted";
+    this.text = String(text ?? "");
+    this.language = String(language || "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "preformatted",
+      text: this.text,
+      ...this.language ? { language: this.language } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    if (this.language) {
+      return `<pre><code class="language-${escapeHtml(this.language)}">${escapeHtml(this.text)}</code></pre>`;
+    }
+    return `<pre>${escapeHtml(this.text)}</pre>`;
+  }
+  static create(text, language, options) {
+    return new _InputRichBlockPreformatted(text, language, options);
+  }
+};
+var RichBlockPreformatted = InputRichBlockPreformatted;
+var InputRichBlockFooter = class _InputRichBlockFooter {
+  /**
+   * @param {string} text
+   * @param {object} [options={}]
+   */
+  constructor(text, options = {}) {
+    this.type = "footer";
+    this.text = String(text ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "footer",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<i>${escapeHtml(this.text)}</i>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockFooter(text, options);
+  }
+};
+var RichBlockFooter = InputRichBlockFooter;
+var InputRichBlockDivider = class _InputRichBlockDivider {
+  /**
+   * @param {object} [options={}]
+   */
+  constructor(options = {}) {
+    this.type = "divider";
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "divider",
+      ...this.options
+    };
+  }
+  toHtml() {
+    return "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500";
+  }
+  static create(options) {
+    return new _InputRichBlockDivider(options);
+  }
+};
+var RichBlockDivider = InputRichBlockDivider;
+var InputRichBlockMathematicalExpression = class _InputRichBlockMathematicalExpression {
+  /**
+   * @param {string} expression
+   * @param {object} [options={}]
+   */
+  constructor(expression, options = {}) {
+    this.type = "mathematical_expression";
+    this.expression = String(expression ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "mathematical_expression",
+      expression: this.expression,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<tg-math>${escapeHtml(this.expression)}</tg-math>`;
+  }
+  static create(expression, options) {
+    return new _InputRichBlockMathematicalExpression(expression, options);
+  }
+};
+var RichBlockMathematicalExpression = InputRichBlockMathematicalExpression;
+var RichBlockMath = InputRichBlockMathematicalExpression;
+var InputRichBlockAnchor = class _InputRichBlockAnchor {
+  /**
+   * @param {string} name
+   * @param {string} [text='']
+   * @param {object} [options={}]
+   */
+  constructor(name, text = "", options = {}) {
+    this.type = "anchor";
+    this.name = String(name ?? "");
+    this.text = String(text ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "anchor",
+      name: this.name,
+      ...this.text ? { text: this.text } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<a name="${escapeHtml(this.name)}">${escapeHtml(this.text)}</a>`;
+  }
+  static create(name, text, options) {
+    return new _InputRichBlockAnchor(name, text, options);
+  }
+};
+var RichBlockAnchor = InputRichBlockAnchor;
+var InputRichBlockListItem = class _InputRichBlockListItem {
+  /**
+   * @param {string} text
+   * @param {object} [options={}]
+   * @param {boolean|null} [options.is_checked] - True for checked checkbox, false for unchecked, null for bullet
+   * @param {number|null} [options.number] - Numeric index for numbered lists
+   * @param {string} [options.type] - Item type override
+   */
+  constructor(text, options = {}) {
+    this.text = String(text ?? "");
+    this.is_checked = options.is_checked ?? options.isChecked ?? null;
+    this.number = options.number !== void 0 && options.number !== null ? Number(options.number) : null;
+    this.type = options.type ?? null;
+    this.options = options;
+  }
+  /**
+   * Check this item (for checklists)
+   * @param {boolean} [checked=true]
+   * @returns {this}
+   */
+  check(checked = true) {
+    this.is_checked = Boolean(checked);
+    return this;
+  }
+  /**
+   * Uncheck this item
+   * @returns {this}
+   */
+  uncheck() {
+    this.is_checked = false;
+    return this;
+  }
+  toJSON() {
+    const res = {
+      text: this.text
+    };
+    if (this.is_checked !== null && this.is_checked !== void 0) {
+      res.is_checked = Boolean(this.is_checked);
+    }
+    if (this.number !== null && this.number !== void 0) {
+      res.number = Number(this.number);
+    }
+    if (this.type) {
+      res.type = this.type;
+    }
+    return res;
+  }
+  toHtml() {
+    if (this.is_checked === true) {
+      return `\u2611\uFE0F ${escapeHtml(this.text)}`;
+    }
+    if (this.is_checked === false) {
+      return `\u25FB\uFE0F ${escapeHtml(this.text)}`;
+    }
+    if (this.number !== null) {
+      return `${this.number}. ${escapeHtml(this.text)}`;
+    }
+    return `\u2022 ${escapeHtml(this.text)}`;
+  }
+  static checked(text, options = {}) {
+    return new _InputRichBlockListItem(text, { is_checked: true, ...options });
+  }
+  static unchecked(text, options = {}) {
+    return new _InputRichBlockListItem(text, { is_checked: false, ...options });
+  }
+  static bullet(text, options = {}) {
+    return new _InputRichBlockListItem(text, options);
+  }
+  static numbered(number, text, options = {}) {
+    return new _InputRichBlockListItem(text, { number, ...options });
+  }
+};
+var RichBlockListItem = InputRichBlockListItem;
+var InputRichBlockList = class _InputRichBlockList {
+  /**
+   * @param {Array<InputRichBlockListItem|string|object>} [items=[]]
+   * @param {object} [options={}]
+   * @param {boolean} [options.ordered=false]
+   */
+  constructor(items = [], options = {}) {
+    this.type = "list";
+    this.ordered = Boolean(options.ordered);
+    this.options = options;
+    this.items = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item instanceof InputRichBlockListItem) {
+        this.items.push(item);
+      } else if (typeof item === "object" && item !== null) {
+        const itemNumber = this.ordered && item.number === void 0 ? i + 1 : item.number;
+        this.items.push(new InputRichBlockListItem(item.text ?? item.title ?? "", { number: itemNumber, ...item }));
+      } else {
+        const itemNumber = this.ordered ? i + 1 : null;
+        this.items.push(new InputRichBlockListItem(String(item), { number: itemNumber }));
+      }
+    }
+  }
+  /**
+   * Add an item to the list
+   * @param {InputRichBlockListItem|string|object} item
+   * @returns {this}
+   */
+  addItem(item) {
+    if (item instanceof InputRichBlockListItem) {
+      this.items.push(item);
+    } else if (typeof item === "object" && item !== null) {
+      const itemNumber = this.ordered && item.number === void 0 ? this.items.length + 1 : item.number;
+      this.items.push(new InputRichBlockListItem(item.text ?? item.title ?? "", { number: itemNumber, ...item }));
+    } else {
+      const itemNumber = this.ordered ? this.items.length + 1 : null;
+      this.items.push(new InputRichBlockListItem(String(item), { number: itemNumber }));
+    }
+    return this;
+  }
+  toJSON() {
+    return {
+      type: "list",
+      items: this.items.map((it) => typeof it.toJSON === "function" ? it.toJSON() : it),
+      ...this.ordered ? { ordered: true } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return this.items.map((it) => typeof it.toHtml === "function" ? it.toHtml() : `\u2022 ${escapeHtml(it.text || String(it))}`).join("\n");
+  }
+  static create(items, options) {
+    return new _InputRichBlockList(items, options);
+  }
+  static ordered(items, options = {}) {
+    return new _InputRichBlockList(items, { ordered: true, ...options });
+  }
+  static checklist(items, options = {}) {
+    const listItems = items.map((it) => {
+      if (typeof it === "object" && it !== null && it.is_checked !== void 0) {
+        return it;
+      }
+      return { text: String(it), is_checked: false };
+    });
+    return new _InputRichBlockList(listItems, options);
+  }
+};
+var RichBlockList = InputRichBlockList;
+var InputRichBlockChecklist = class _InputRichBlockChecklist extends InputRichBlockList {
+  constructor(items = [], options = {}) {
+    super(items, { checklist: true, ...options });
+    this.type = "checklist";
+  }
+  toJSON() {
+    return {
+      type: "checklist",
+      items: this.items.map((it) => typeof it.toJSON === "function" ? it.toJSON() : it),
+      ...this.options
+    };
+  }
+  toHtml() {
+    return this.items.map((it) => {
+      const isChecked = typeof it === "object" && it !== null && (it.is_checked || it.checked);
+      const mark = isChecked ? "\u2611\uFE0F" : "\u25FB\uFE0F";
+      const text = typeof it === "object" && it !== null ? it.text || String(it) : String(it);
+      return `${mark} ${escapeHtml(text)}`;
+    }).join("\n");
+  }
+  static create(items, options) {
+    return new _InputRichBlockChecklist(items, options);
+  }
+};
+var RichBlockChecklist = InputRichBlockChecklist;
+var InputRichBlockBlockQuotation = class _InputRichBlockBlockQuotation {
+  /**
+   * @param {string} text
+   * @param {object} [options={}]
+   */
+  constructor(text, options = {}) {
+    this.type = "block_quotation";
+    this.text = String(text ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "block_quotation",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<blockquote>${escapeHtml(this.text)}</blockquote>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockBlockQuotation(text, options);
+  }
+};
+var RichBlockBlockQuotation = InputRichBlockBlockQuotation;
+var InputRichBlockPullQuotation = class _InputRichBlockPullQuotation {
+  /**
+   * @param {string} text
+   * @param {object} [options={}]
+   */
+  constructor(text, options = {}) {
+    this.type = "pull_quotation";
+    this.text = String(text ?? "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "pull_quotation",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<tg-pullquote>${escapeHtml(this.text)}</tg-pullquote>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockPullQuotation(text, options);
+  }
+};
+var RichBlockPullQuotation = InputRichBlockPullQuotation;
+var RichBlockPullQuote = InputRichBlockPullQuotation;
+var InputRichBlockCollage = class _InputRichBlockCollage {
+  /**
+   * @param {Array<object|string>} [media=[]]
+   * @param {object} [options={}]
+   */
+  constructor(media = [], options = {}) {
+    this.type = "collage";
+    this.media = Array.isArray(media) ? media : [media];
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "collage",
+      media: this.media.map((m) => typeof m?.toJSON === "function" ? m.toJSON() : m),
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F5BC}\uFE0F [Collage: ${this.media.length} media items]`;
+  }
+  static create(media, options) {
+    return new _InputRichBlockCollage(media, options);
+  }
+};
+var RichBlockCollage = InputRichBlockCollage;
+var InputRichBlockSlideshow = class _InputRichBlockSlideshow {
+  /**
+   * @param {Array<object|string>} [media=[]]
+   * @param {object} [options={}]
+   */
+  constructor(media = [], options = {}) {
+    this.type = "slideshow";
+    this.media = Array.isArray(media) ? media : [media];
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "slideshow",
+      media: this.media.map((m) => typeof m?.toJSON === "function" ? m.toJSON() : m),
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F39E}\uFE0F [Slideshow: ${this.media.length} items]`;
+  }
+  static create(media, options) {
+    return new _InputRichBlockSlideshow(media, options);
+  }
+};
+var RichBlockSlideshow = InputRichBlockSlideshow;
+var InputRichBlockDetails = class _InputRichBlockDetails {
+  /**
+   * @param {string} title
+   * @param {string|Array<object>} [content='']
+   * @param {object} [options={}]
+   */
+  constructor(title, content = "", options = {}) {
+    this.type = "details";
+    this.title = String(title ?? "");
+    this.content = content;
+    this.is_open = Boolean(options.is_open ?? options.isOpen);
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "details",
+      title: this.title,
+      content: typeof this.content === "object" && this.content !== null && typeof this.content.toJSON === "function" ? this.content.toJSON() : this.content,
+      is_open: this.is_open,
+      ...this.options
+    };
+  }
+  toHtml() {
+    const body = typeof this.content === "string" ? escapeHtml(this.content) : Array.isArray(this.content) ? this.content.map((c) => typeof c?.toHtml === "function" ? c.toHtml() : String(c)).join("\n") : "";
+    return `<details${this.is_open ? " open" : ""}><summary>${escapeHtml(this.title)}</summary>${body}</details>`;
+  }
+  static create(title, content, options) {
+    return new _InputRichBlockDetails(title, content, options);
+  }
+};
+var RichBlockDetails = InputRichBlockDetails;
+var InputRichBlockMap = class _InputRichBlockMap {
+  /**
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {object} [options={}]
+   */
+  constructor(latitude, longitude, options = {}) {
+    this.type = "map";
+    this.latitude = Number(latitude);
+    this.longitude = Number(longitude);
+    this.title = options.title || "";
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "map",
+      latitude: this.latitude,
+      longitude: this.longitude,
+      ...this.title ? { title: this.title } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F4CD} <b>${escapeHtml(this.title || "Location")}</b> (${this.latitude.toFixed(4)}, ${this.longitude.toFixed(4)})`;
+  }
+  static create(latitude, longitude, options) {
+    return new _InputRichBlockMap(latitude, longitude, options);
+  }
+};
+var RichBlockMap = InputRichBlockMap;
+var InputRichBlockAnimation = class _InputRichBlockAnimation {
+  /**
+   * @param {string} animation
+   * @param {object} [options={}]
+   */
+  constructor(animation, options = {}) {
+    this.type = "animation";
+    this.animation = animation;
+    this.caption = options.caption || "";
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "animation",
+      animation: this.animation,
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F3AC} <b>[Animation]</b> ${escapeHtml(this.caption || "")}`;
+  }
+  static create(animation, options) {
+    return new _InputRichBlockAnimation(animation, options);
+  }
+};
+var RichBlockAnimation = InputRichBlockAnimation;
+var InputRichBlockAudio = class _InputRichBlockAudio {
+  /**
+   * @param {string} audio
+   * @param {object} [options={}]
+   */
+  constructor(audio, options = {}) {
+    this.type = "audio";
+    this.audio = audio;
+    this.title = options.title || "";
+    this.performer = options.performer || "";
+    this.duration = options.duration;
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "audio",
+      audio: this.audio,
+      ...this.title ? { title: this.title } : {},
+      ...this.performer ? { performer: this.performer } : {},
+      ...this.duration !== void 0 ? { duration: Number(this.duration) } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    const titleStr = this.performer ? `${this.performer} - ${this.title}` : this.title || "Audio";
+    return `\u{1F3B5} <b>${escapeHtml(titleStr)}</b>`;
+  }
+  static create(audio, options) {
+    return new _InputRichBlockAudio(audio, options);
+  }
+};
+var RichBlockAudio = InputRichBlockAudio;
+var InputRichBlockPhoto = class _InputRichBlockPhoto {
+  /**
+   * @param {string} photo
+   * @param {string} [caption='']
+   * @param {object} [options={}]
+   */
+  constructor(photo, caption = "", options = {}) {
+    this.type = "photo";
+    this.photo = photo;
+    this.caption = String(caption || options.caption || "");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "photo",
+      photo: this.photo,
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F5BC}\uFE0F <b>[Photo]</b> ${escapeHtml(this.caption || "")}`;
+  }
+  static create(photo, caption, options) {
+    return new _InputRichBlockPhoto(photo, caption, options);
+  }
+};
+var RichBlockPhoto = InputRichBlockPhoto;
+var InputRichBlockVideo = class _InputRichBlockVideo {
+  /**
+   * @param {string} video
+   * @param {object} [options={}]
+   */
+  constructor(video, options = {}) {
+    this.type = "video";
+    this.video = video;
+    this.caption = options.caption || "";
+    this.duration = options.duration;
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "video",
+      video: this.video,
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.duration !== void 0 ? { duration: Number(this.duration) } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F3A5} <b>[Video]</b> ${escapeHtml(this.caption || "")}`;
+  }
+  static create(video, options) {
+    return new _InputRichBlockVideo(video, options);
+  }
+};
+var RichBlockVideo = InputRichBlockVideo;
+var InputRichBlockVoiceNote = class _InputRichBlockVoiceNote {
+  /**
+   * @param {string} voiceNote
+   * @param {object} [options={}]
+   */
+  constructor(voiceNote, options = {}) {
+    this.type = "voice_note";
+    this.voice_note = voiceNote;
+    this.caption = options.caption || "";
+    this.duration = options.duration;
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "voice_note",
+      voice_note: this.voice_note,
+      ...this.caption ? { caption: this.caption } : {},
+      ...this.duration !== void 0 ? { duration: Number(this.duration) } : {},
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `\u{1F3A4} <b>[Voice Note]</b> ${escapeHtml(this.caption || "")}`;
+  }
+  static create(voiceNote, options) {
+    return new _InputRichBlockVoiceNote(voiceNote, options);
+  }
+};
+var RichBlockVoiceNote = InputRichBlockVoiceNote;
+var InputRichBlockThinking = class _InputRichBlockThinking {
+  /**
+   * @param {string} [text='Thinking...']
+   * @param {object} [options={}]
+   */
+  constructor(text = "Thinking...", options = {}) {
+    this.type = "thinking";
+    this.text = String(text ?? "Thinking...");
+    this.options = options;
+  }
+  toJSON() {
+    return {
+      type: "thinking",
+      text: this.text,
+      ...this.options
+    };
+  }
+  toHtml() {
+    return `<tg-thinking>${escapeHtml(this.text)}</tg-thinking>`;
+  }
+  static create(text, options) {
+    return new _InputRichBlockThinking(text, options);
+  }
+};
+var RichBlockThinking = InputRichBlockThinking;
+var InputRichMessageMedia = class _InputRichMessageMedia {
+  /**
+   * @param {string} media
+   * @param {string} [type='photo']
+   * @param {object} [options={}]
+   */
+  constructor(media, type = "photo", options = {}) {
+    if (typeof media === "object" && media !== null) {
+      this.media = media.media;
+      this.type = media.type || type || "photo";
+      this.caption = media.caption || options.caption || "";
+      this.parse_mode = media.parse_mode || media.parseMode || options.parse_mode;
+      this.show_caption_above_media = media.show_caption_above_media ?? media.showCaptionAboveMedia ?? options.show_caption_above_media;
+      this.has_spoiler = media.has_spoiler ?? media.hasSpoiler ?? options.has_spoiler;
+      this.width = media.width ?? options.width;
+      this.height = media.height ?? options.height;
+      this.duration = media.duration ?? options.duration;
+      this.performer = media.performer ?? options.performer;
+      this.title = media.title ?? options.title;
+      this.thumbnail = media.thumbnail ?? options.thumbnail;
+      this.options = { ...options, ...media };
+    } else {
+      this.media = media;
+      this.type = type;
+      this.caption = options.caption || "";
+      this.parse_mode = options.parse_mode || options.parseMode;
+      this.show_caption_above_media = options.show_caption_above_media ?? options.showCaptionAboveMedia;
+      this.has_spoiler = options.has_spoiler ?? options.hasSpoiler;
+      this.width = options.width;
+      this.height = options.height;
+      this.duration = options.duration;
+      this.performer = options.performer;
+      this.title = options.title;
+      this.thumbnail = options.thumbnail;
+      this.options = options;
+    }
+  }
+  toJSON() {
+    const res = {
+      type: this.type,
+      media: this.media
+    };
+    if (this.caption) res.caption = this.caption;
+    if (this.parse_mode) res.parse_mode = this.parse_mode;
+    if (this.show_caption_above_media !== void 0) res.show_caption_above_media = Boolean(this.show_caption_above_media);
+    if (this.has_spoiler !== void 0) res.has_spoiler = Boolean(this.has_spoiler);
+    if (this.width !== void 0) res.width = Number(this.width);
+    if (this.height !== void 0) res.height = Number(this.height);
+    if (this.duration !== void 0) res.duration = Number(this.duration);
+    if (this.performer) res.performer = this.performer;
+    if (this.title) res.title = this.title;
+    if (this.thumbnail) res.thumbnail = this.thumbnail;
+    return res;
+  }
+  static photo(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "photo", { caption, ...options });
+  }
+  static video(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "video", { caption, ...options });
+  }
+  static animation(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "animation", { caption, ...options });
+  }
+  static audio(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "audio", { caption, ...options });
+  }
+  static document(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "document", { caption, ...options });
+  }
+  static voiceNote(media, caption = "", options = {}) {
+    return new _InputRichMessageMedia(media, "voice_note", { caption, ...options });
+  }
+};
+var RichMessageMedia = InputRichMessageMedia;
+var InputMediaVoiceNote = class _InputMediaVoiceNote {
+  /**
+   * @param {string} media
+   * @param {object} [options={}]
+   */
+  constructor(media, options = {}) {
+    this.type = "voice";
+    this.media = media;
+    this.caption = options.caption || "";
+    this.parse_mode = options.parse_mode || options.parseMode;
+    this.duration = options.duration;
+    this.options = options;
+  }
+  toJSON() {
+    const res = {
+      type: this.type,
+      media: this.media
+    };
+    if (this.caption) res.caption = this.caption;
+    if (this.parse_mode) res.parse_mode = this.parse_mode;
+    if (this.duration !== void 0) res.duration = Number(this.duration);
+    return res;
+  }
+  static create(media, options = {}) {
+    return new _InputMediaVoiceNote(media, options);
+  }
+};
+var MediaVoiceNote = InputMediaVoiceNote;
+var InputRichMessage = class _InputRichMessage {
+  /**
+   * @param {object|string} [options={}]
+   */
+  constructor(options = {}) {
+    if (typeof options === "string") {
+      this.text = options;
+      this.blocks = [];
+      this.media = [];
+      this.is_rtl = false;
+    } else {
+      this.text = options.text || options.html || "";
+      this.blocks = options.blocks ? [...options.blocks] : [];
+      this.media = options.media ? [...options.media] : [];
+      this.is_rtl = Boolean(options.is_rtl ?? options.isRtl);
+      this.draft_id = options.draft_id ?? options.draftId;
+      this.ephemeral_message_parameters = options.ephemeral_message_parameters ?? options.ephemeral;
+      this.reply_markup = options.reply_markup;
+    }
+  }
+  /**
+   * Add a block to the rich message
+   * @param {object} block
+   * @returns {this}
+   */
+  addBlock(block) {
+    this.blocks.push(block);
+    return this;
+  }
+  /**
+   * Add a media attachment
+   * @param {InputRichMessageMedia|object} mediaItem
+   * @returns {this}
+   */
+  addMedia(mediaItem) {
+    this.media.push(mediaItem);
+    return this;
+  }
+  /**
+   * Set right-to-left text direction
+   * @param {boolean} [rtl=true]
+   * @returns {this}
+   */
+  setRtl(rtl = true) {
+    this.is_rtl = Boolean(rtl);
+    return this;
+  }
+  toJSON() {
+    return {
+      text: this.text,
+      blocks: this.blocks.map((b) => typeof b?.toJSON === "function" ? b.toJSON() : b),
+      media: this.media.map((m) => typeof m?.toJSON === "function" ? m.toJSON() : m),
+      ...this.is_rtl ? { is_rtl: true } : {},
+      ...this.draft_id !== void 0 ? { draft_id: this.draft_id } : {},
+      ...this.ephemeral_message_parameters ? { ephemeral_message_parameters: this.ephemeral_message_parameters } : {},
+      ...this.reply_markup ? { reply_markup: this.reply_markup } : {}
+    };
+  }
+  static create(options) {
+    return new _InputRichMessage(options);
+  }
+};
 var RichMessageBuilder = class _RichMessageBuilder {
   constructor(initialText = "") {
     this.blocks = [];
@@ -4915,7 +7804,8 @@ var RichMessageBuilder = class _RichMessageBuilder {
     this._inlineKeyboard = [];
     this._draftId = null;
     this._ephemeral = null;
-    this._media = null;
+    this._media = [];
+    this._isRtl = false;
     this._extra = {};
   }
   /**
@@ -5039,21 +7929,24 @@ var RichMessageBuilder = class _RichMessageBuilder {
    * @returns {this}
    */
   quote(text, expandable = false) {
+    if (expandable) {
+      return this.expandableBlockQuotation(text);
+    }
     this.blocks.push({
       type: "quote",
       content: text,
-      expandable,
-      rawHtml: expandable ? `<blockquote expandable>${escapeHtml(text)}</blockquote>` : `<blockquote>${escapeHtml(text)}</blockquote>`
+      expandable: false,
+      rawHtml: `<blockquote>${escapeHtml(text)}</blockquote>`
     });
     return this;
   }
   /**
-   * Add an expandable blockquote
+   * Add an expandable blockquote (Telegram Bot API 10.3)
    * @param {string} text
    * @returns {this}
    */
   expandableQuote(text) {
-    return this.quote(text, true);
+    return this.expandableBlockQuotation(text);
   }
   /**
    * Add a collapsible / expandable blockquote (alias)
@@ -5061,7 +7954,18 @@ var RichMessageBuilder = class _RichMessageBuilder {
    * @returns {this}
    */
   collapsibleQuote(text) {
-    return this.quote(text, true);
+    return this.expandableBlockQuotation(text);
+  }
+  /**
+   * Add expandable block quotation (Bot API 10.3 InputRichBlockExpandableBlockQuotation)
+   * @param {string} text
+   * @param {object} [options]
+   * @returns {this}
+   */
+  expandableBlockQuotation(text, options = {}) {
+    const block = new InputRichBlockExpandableBlockQuotation(text, options);
+    this.blocks.push(block);
+    return this;
   }
   /**
    * Add spoiler block
@@ -5107,20 +8011,252 @@ var RichMessageBuilder = class _RichMessageBuilder {
     return this;
   }
   /**
-   * Add bullet list
-   * @param {Array<string>} items
-   * @param {string} [bullet='•']
+   * Add document link using tg://document?id= (Bot API 10.3)
+   * @param {string} documentId
+   * @param {string} [text='Document']
    * @returns {this}
    */
-  list(items, bullet = "\u2022") {
+  documentLink(documentId, text = "Document") {
+    return this.link(text, `tg://document?id=${documentId}`);
+  }
+  /**
+   * Add bullet list
+   * @param {Array<string>} items
+   * @param {string|object} [bulletOrOptions='•']
+   * @returns {this}
+   */
+  list(items, bulletOrOptions = "\u2022") {
+    if (typeof bulletOrOptions === "object") {
+      this.blocks.push(new InputRichBlockList(items, bulletOrOptions));
+      return this;
+    }
     const listItems = Array.isArray(items) ? items : [items];
+    const bullet = typeof bulletOrOptions === "string" ? bulletOrOptions : "\u2022";
     const htmlLines = listItems.map((item) => `${bullet} ${escapeHtml(item)}`).join("\n");
-    this.blocks.push({
-      type: "list",
-      items: listItems,
-      bullet,
-      rawHtml: htmlLines
-    });
+    this.blocks.push(new InputRichBlockList(listItems, { bullet, rawHtml: htmlLines }));
+    return this;
+  }
+  /**
+   * Add a checklist block with check states (Bot API 10.2+)
+   * @param {Array<any>} items
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  checklist(items, options = {}) {
+    this.blocks.push(new InputRichBlockChecklist(items, options));
+    return this;
+  }
+  /**
+   * Add section heading block (Bot API 10.2+)
+   * @param {string} text
+   * @param {number} [level=2]
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  sectionHeading(text, level = 2, options = {}) {
+    this.blocks.push(new InputRichBlockSectionHeading(text, level, options));
+    return this;
+  }
+  /**
+   * Add heading alias (Bot API 10.2+)
+   * @param {string} text
+   * @param {number} [level=2]
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  heading(text, level = 2, options = {}) {
+    return this.sectionHeading(text, level, options);
+  }
+  /**
+   * Add preformatted code/text block (Bot API 10.2+)
+   * @param {string} text
+   * @param {string} [language='']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  preformatted(text, language = "", options = {}) {
+    this.blocks.push(new InputRichBlockPreformatted(text, language, options));
+    return this;
+  }
+  /**
+   * Add footer block (Bot API 10.2+)
+   * @param {string} text
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  footer(text, options = {}) {
+    this.blocks.push(new InputRichBlockFooter(text, options));
+    return this;
+  }
+  /**
+   * Add horizontal divider block (Bot API 10.2+)
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  divider(options = {}) {
+    this.blocks.push(new InputRichBlockDivider(options));
+    return this;
+  }
+  /**
+   * Add mathematical expression / LaTeX block (Bot API 10.2+)
+   * @param {string} expression
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  math(expression, options = {}) {
+    this.blocks.push(new InputRichBlockMathematicalExpression(expression, options));
+    return this;
+  }
+  /**
+   * Add mathematical expression alias (Bot API 10.2+)
+   * @param {string} expression
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  mathematicalExpression(expression, options = {}) {
+    return this.math(expression, options);
+  }
+  /**
+   * Add in-message anchor block (Bot API 10.2+)
+   * @param {string} name
+   * @param {string} [text='']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  anchor(name, text = "", options = {}) {
+    this.blocks.push(new InputRichBlockAnchor(name, text, options));
+    return this;
+  }
+  /**
+   * Add block quotation block (Bot API 10.2+)
+   * @param {string} text
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  blockQuotation(text, options = {}) {
+    this.blocks.push(new InputRichBlockBlockQuotation(text, options));
+    return this;
+  }
+  /**
+   * Add pull quotation block with center emphasis (Bot API 10.2+)
+   * @param {string} text
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  pullQuote(text, options = {}) {
+    this.blocks.push(new InputRichBlockPullQuotation(text, options));
+    return this;
+  }
+  /**
+   * Add pull quotation alias (Bot API 10.2+)
+   * @param {string} text
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  pullQuotation(text, options = {}) {
+    return this.pullQuote(text, options);
+  }
+  /**
+   * Add collage block (Bot API 10.2+)
+   * @param {Array<any>} media
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  collage(media, options = {}) {
+    this.blocks.push(new InputRichBlockCollage(media, options));
+    return this;
+  }
+  /**
+   * Add slideshow block (Bot API 10.2+)
+   * @param {Array<any>} media
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  slideshow(media, options = {}) {
+    this.blocks.push(new InputRichBlockSlideshow(media, options));
+    return this;
+  }
+  /**
+   * Add details / expandable disclosure block (Bot API 10.2+)
+   * @param {string} title
+   * @param {string|Array<any>} [content='']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  details(title, content = "", options = {}) {
+    this.blocks.push(new InputRichBlockDetails(title, content, options));
+    return this;
+  }
+  /**
+   * Add interactive map block (Bot API 10.2+)
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  map(latitude, longitude, options = {}) {
+    this.blocks.push(new InputRichBlockMap(latitude, longitude, options));
+    return this;
+  }
+  /**
+   * Add animation / GIF block (Bot API 10.2+)
+   * @param {string} animation
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  animation(animation, options = {}) {
+    this.blocks.push(new InputRichBlockAnimation(animation, options));
+    return this;
+  }
+  /**
+   * Add audio track block (Bot API 10.2+)
+   * @param {string} audio
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  audio(audio, options = {}) {
+    this.blocks.push(new InputRichBlockAudio(audio, options));
+    return this;
+  }
+  /**
+   * Add photo block (Bot API 10.2+)
+   * @param {string} photo
+   * @param {string} [caption='']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  photo(photo, caption = "", options = {}) {
+    this.blocks.push(new InputRichBlockPhoto(photo, caption, options));
+    return this;
+  }
+  /**
+   * Add video block (Bot API 10.2+)
+   * @param {string} video
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  video(video, options = {}) {
+    this.blocks.push(new InputRichBlockVideo(video, options));
+    return this;
+  }
+  /**
+   * Add voice note block (Bot API 10.2+)
+   * @param {string} voiceNote
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  voiceNote(voiceNote, options = {}) {
+    this.blocks.push(new InputRichBlockVoiceNote(voiceNote, options));
+    return this;
+  }
+  /**
+   * Add AI thinking indicator block (Bot API 10.2+)
+   * @param {string} [text='Thinking...']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  thinking(text = "Thinking...", options = {}) {
+    this.blocks.push(new InputRichBlockThinking(text, options));
     return this;
   }
   /**
@@ -5156,36 +8292,117 @@ var RichMessageBuilder = class _RichMessageBuilder {
     return this;
   }
   /**
-   * Add divider line
+   * Add table block (Bot API 10.3 InputRichBlockTable / RichBlockTable)
+   * Supports standard headers, rows, is_bordered, and is_compact mode
+   * @param {Array<string>|Table|InputRichBlockTable|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
    * @returns {this}
    */
-  divider() {
-    this.blocks.push({
-      type: "divider",
-      rawHtml: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
-    });
+  table(headersOrTable, rows = [], options = {}) {
+    let block;
+    if (headersOrTable instanceof InputRichBlockTable) {
+      block = headersOrTable;
+    } else if (headersOrTable instanceof Table) {
+      block = new InputRichBlockTable(headersOrTable.headers, headersOrTable.rows, {
+        is_compact: headersOrTable.is_compact,
+        is_bordered: headersOrTable.is_bordered,
+        is_striped: headersOrTable.is_striped,
+        caption: headersOrTable.caption,
+        alignments: headersOrTable._alignments,
+        title: headersOrTable._title,
+        style: headersOrTable._style,
+        col1Width: headersOrTable.col1Width,
+        ...options
+      });
+    } else if (headersOrTable && typeof headersOrTable === "object" && !Array.isArray(headersOrTable)) {
+      block = new InputRichBlockTable(headersOrTable);
+    } else {
+      block = new InputRichBlockTable(headersOrTable, rows, { is_bordered: true, ...options });
+    }
+    this.blocks.push(block);
     return this;
   }
   /**
-   * Attach photo or media
-   * @param {string} url
-   * @param {string} [caption]
+   * Add a card table block (matching Telegram Bot Card Table UI with rounded container and grid lines)
+   * @param {Array<string>|Table|object} headersOrTable
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
    * @returns {this}
    */
-  photo(url, caption = "") {
-    this._media = { type: "photo", url, caption };
+  cardTable(headersOrTable, rows = [], options = {}) {
+    return this.table(headersOrTable, rows, { is_bordered: true, ...options });
+  }
+  /**
+   * Add pre-configured system status card table (matching Telegram bot screenshot)
+   * @param {object} [data={}]
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  systemStatus(data = {}, options = {}) {
+    const table = Table.systemStatus(data, options);
+    return this.table(table);
+  }
+  /**
+   * Add pre-configured user profile card table (matching Telegram bot screenshot)
+   * @param {object} [data={}]
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  userProfile(data = {}, options = {}) {
+    const table = Table.userProfile(data, options);
+    return this.table(table);
+  }
+  /**
+   * Add compact table block (Bot API 10.3 is_compact table)
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} [rows=[]]
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  compactTable(headers, rows = [], options = {}) {
+    return this.table(headers, rows, { ...options, is_compact: true });
+  }
+  /**
+   * Add document block (Bot API 10.3 InputRichBlockDocument)
+   * @param {string|object} document
+   * @param {string} [caption='']
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  document(document, caption = "", options = {}) {
+    const block = new InputRichBlockDocument(document, caption, options);
+    this.blocks.push(block);
     return this;
   }
   /**
-   * Set ephemeral parameters (disappearing message)
-   * @param {number|object} lifetimeSecondsOrParams
+   * Add buttons block to the rich message (Bot API 10.3 InputRichBlockButtons)
+   * @param {Array<Array<object>>|Array<object>} buttonsMatrix
+   * @returns {this}
+   */
+  buttons(buttonsMatrix) {
+    const block = new InputRichBlockButtons(buttonsMatrix);
+    this.blocks.push(block);
+    return this;
+  }
+  /**
+   * Add buttons block (alias)
+   */
+  addButtonsBlock(buttonsMatrix) {
+    return this.buttons(buttonsMatrix);
+  }
+  /**
+   * Set ephemeral parameters (Bot API 10.3 EphemeralMessageParameters)
+   * @param {number|object|EphemeralMessageParameters} lifetimeSecondsOrParams
    * @returns {this}
    */
   ephemeral(lifetimeSecondsOrParams = 60) {
-    if (typeof lifetimeSecondsOrParams === "number") {
-      this._ephemeral = { lifetime: lifetimeSecondsOrParams };
-    } else {
+    if (lifetimeSecondsOrParams instanceof EphemeralMessageParameters) {
       this._ephemeral = lifetimeSecondsOrParams;
+    } else if (typeof lifetimeSecondsOrParams === "number") {
+      this._ephemeral = new EphemeralMessageParameters(lifetimeSecondsOrParams);
+    } else {
+      this._ephemeral = new EphemeralMessageParameters(lifetimeSecondsOrParams);
     }
     return this;
   }
@@ -5344,7 +8561,16 @@ var RichMessageBuilder = class _RichMessageBuilder {
     return this;
   }
   /**
-   * Compile all rich blocks into standard HTML text for compatibility
+   * Add raw custom block
+   * @param {object} block
+   * @returns {this}
+   */
+  addBlock(block) {
+    this.blocks.push(block);
+    return this;
+  }
+  /**
+   * Compile HTML string representation for Telegram HTML mode
    * @returns {string}
    */
   compileHtml() {
@@ -5353,7 +8579,9 @@ var RichMessageBuilder = class _RichMessageBuilder {
       parts.push(this._text);
     }
     for (const block of this.blocks) {
-      if (block.rawHtml) {
+      if (typeof block?.toHtml === "function") {
+        parts.push(block.toHtml());
+      } else if (block?.rawHtml) {
         parts.push(block.rawHtml);
       }
     }
@@ -5369,27 +8597,77 @@ var RichMessageBuilder = class _RichMessageBuilder {
     const payload = {
       text: compiledText || " ",
       parse_mode: this._parseMode,
-      blocks: this.blocks.map((b) => ({
-        type: b.type,
-        content: b.content,
-        language: b.language,
-        expandable: b.expandable,
-        items: b.items,
-        label: b.label,
-        value: b.value
-      })),
+      blocks: this.blocks.map((b) => {
+        if (typeof b?.toJSON === "function") {
+          return b.toJSON();
+        }
+        return { ...b };
+      }),
       ...this._extra
     };
+    if (this._media && this._media.length > 0) {
+      payload.media = this._media.map((m) => typeof m?.toJSON === "function" ? m.toJSON() : m);
+    }
+    if (this._isRtl !== void 0) {
+      payload.is_rtl = Boolean(this._isRtl);
+    }
     if (replyMarkup) {
       payload.reply_markup = replyMarkup;
     }
     if (this._ephemeral) {
-      payload.ephemeral_parameters = this._ephemeral;
+      const ephemeralObj = typeof this._ephemeral.toJSON === "function" ? this._ephemeral.toJSON() : this._ephemeral;
+      payload.ephemeral_message_parameters = ephemeralObj;
+      payload.ephemeral_parameters = ephemeralObj;
     }
     if (this._draftId !== null) {
       payload.draft_id = this._draftId;
     }
     return payload;
+  }
+  /**
+   * Set right-to-left layout mode (Bot API 10.2+)
+   * @param {boolean} [rtl=true]
+   * @returns {this}
+   */
+  isRtl(rtl = true) {
+    this._isRtl = Boolean(rtl);
+    return this;
+  }
+  /**
+   * Add media attachments to the rich message (Bot API 10.2+)
+   * @param {...(object|string|Array<object|string>)} items
+   * @returns {this}
+   */
+  media(...items) {
+    for (const item of items.flat()) {
+      this.addMedia(item);
+    }
+    return this;
+  }
+  /**
+   * Add a single media attachment
+   * @param {object|string} item
+   * @param {object} [options={}]
+   * @returns {this}
+   */
+  addMedia(item, options = {}) {
+    if (item instanceof InputRichMessageMedia) {
+      this._media.push(item);
+    } else if (typeof item === "string") {
+      this._media.push(new InputRichMessageMedia(item, options.type || "photo", options));
+    } else if (typeof item === "object" && item !== null) {
+      this._media.push(new InputRichMessageMedia(item, item.type || options.type || "photo", { ...options, ...item }));
+    } else {
+      this._media.push(item);
+    }
+    return this;
+  }
+  /**
+   * Export as an InputRichMessage instance
+   * @returns {InputRichMessage}
+   */
+  toInputRichMessage() {
+    return new InputRichMessage(this.compile());
   }
   /**
    * Build plain structured Rich Message object
@@ -5459,6 +8737,40 @@ var RichMessageBuilder = class _RichMessageBuilder {
     return new _RichMessageBuilder(initialText);
   }
   /**
+   * Create a rich message pre-populated with a table
+   * @param {Array<string>|Table|InputRichBlockTable} headers
+   * @param {Array<Array<any>>} [rows]
+   * @param {object} [options]
+   * @returns {RichMessageBuilder}
+   */
+  static table(headers, rows = [], options = {}) {
+    const builder = new _RichMessageBuilder();
+    builder.table(headers, rows, options);
+    return builder;
+  }
+  /**
+   * Create a rich message pre-populated with a compact table
+   * @param {Array<string>} headers
+   * @param {Array<Array<any>>} [rows]
+   * @param {object} [options]
+   * @returns {RichMessageBuilder}
+   */
+  static compactTable(headers, rows = [], options = {}) {
+    const builder = new _RichMessageBuilder();
+    builder.compactTable(headers, rows, options);
+    return builder;
+  }
+  /**
+   * Create a rich message with buttons block
+   * @param {Array<Array<object>>|Array<object>} buttonsMatrix
+   * @returns {RichMessageBuilder}
+   */
+  static buttons(buttonsMatrix) {
+    const builder = new _RichMessageBuilder();
+    builder.buttons(buttonsMatrix);
+    return builder;
+  }
+  /**
    * Create a pre-configured interactive Card
    * @param {string} title
    * @param {string} description
@@ -5489,12 +8801,20 @@ var RichMessageBuilder = class _RichMessageBuilder {
   /**
    * Create an ephemeral disappearing message builder
    * @param {string} text
-   * @param {number} [lifetimeSeconds=60]
+   * @param {number|object|EphemeralMessageParameters} [lifetimeSecondsOrParams=60]
    * @returns {RichMessageBuilder}
    */
-  static ephemeral(text, lifetimeSeconds = 60) {
+  static ephemeral(text, lifetimeSecondsOrParams = 60) {
     const builder = new _RichMessageBuilder(text);
-    return builder.ephemeral(lifetimeSeconds);
+    return builder.ephemeral(lifetimeSecondsOrParams);
+  }
+  /**
+   * Helper to format a tg://document?id= link
+   * @param {string} documentId
+   * @param {string} [text='Document']
+   */
+  static documentLink(documentId, text = "Document") {
+    return `<a href="tg://document?id=${escapeHtml(documentId)}">${escapeHtml(text)}</a>`;
   }
 };
 var RichMessage = RichMessageBuilder;
@@ -6243,16 +9563,48 @@ var index_default = Telegix;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BaseScene,
+  BotCommand,
   Composer,
   Context,
+  EphemeralMessageParameters,
   FileSessionStore,
   Format,
   I18n,
   InlineQueryResultBuilder,
+  InputMediaVoiceNote,
+  InputRichBlockAnchor,
+  InputRichBlockAnimation,
+  InputRichBlockAudio,
+  InputRichBlockBlockQuotation,
+  InputRichBlockButtons,
+  InputRichBlockChecklist,
+  InputRichBlockCollage,
+  InputRichBlockDetails,
+  InputRichBlockDivider,
+  InputRichBlockDocument,
+  InputRichBlockExpandableBlockQuotation,
+  InputRichBlockFooter,
+  InputRichBlockList,
+  InputRichBlockListItem,
+  InputRichBlockMap,
+  InputRichBlockMathematicalExpression,
+  InputRichBlockParagraph,
+  InputRichBlockPhoto,
+  InputRichBlockPreformatted,
+  InputRichBlockPullQuotation,
+  InputRichBlockSectionHeading,
+  InputRichBlockSlideshow,
+  InputRichBlockTable,
+  InputRichBlockThinking,
+  InputRichBlockVideo,
+  InputRichBlockVoiceNote,
+  InputRichMessage,
+  InputRichMessageMedia,
   InvoiceBuilder,
   KeyboardBuilder,
   LinkPreview,
   Markup,
+  MediaVoiceNote,
   MemorySessionStore,
   MiniApp,
   MiniAppLoadingScreen,
@@ -6260,10 +9612,43 @@ var index_default = Telegix;
   Polling,
   PollingError,
   RateLimiter,
+  ReplyParameters,
+  RichBlockAnchor,
+  RichBlockAnimation,
+  RichBlockAudio,
+  RichBlockBlockQuotation,
+  RichBlockButtons,
+  RichBlockChecklist,
+  RichBlockCollage,
+  RichBlockDetails,
+  RichBlockDivider,
+  RichBlockDocument,
+  RichBlockExpandableBlockQuotation,
+  RichBlockFooter,
+  RichBlockList,
+  RichBlockListItem,
+  RichBlockMap,
+  RichBlockMath,
+  RichBlockMathematicalExpression,
+  RichBlockParagraph,
+  RichBlockPhoto,
+  RichBlockPreformatted,
+  RichBlockPullQuotation,
+  RichBlockPullQuote,
+  RichBlockSectionHeading,
+  RichBlockSlideshow,
+  RichBlockTable,
+  RichBlockThinking,
+  RichBlockVideo,
+  RichBlockVoiceNote,
   RichMessage,
   RichMessageBuilder,
+  RichMessageButton,
+  RichMessageMedia,
+  RichTextButton,
   Scene,
   Stage,
+  Table,
   Telegix,
   TelegixError,
   TelegixManager,
