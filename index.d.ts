@@ -442,6 +442,15 @@ export class Telegix extends Composer {
   stop(reason?: string): Promise<void>;
   launch(options?: { polling?: boolean | object; webhook?: object; dropPendingUpdates?: boolean }): Promise<User>;
   webhookCallback(path?: string, options?: object): (req: any, res: any, next?: Function) => Promise<void>;
+  pagesWebhookHandler(options?: {
+    secretToken?: string | ((env: any) => string);
+    path?: string;
+    waitUntil?: boolean;
+    respondOnError?: number;
+    enableHealthCheck?: boolean;
+    onUpdate?: (update: any, context: any) => Promise<void> | void;
+    onError?: (err: Error, context: any) => any;
+  }): (context: any, env?: any, ctx?: any) => Promise<Response>;
 }
 
 export class MemorySessionStore {
@@ -655,5 +664,40 @@ export class TelegramError extends TelegixError {
 }
 export class NetworkError extends TelegixError {}
 export class PollingError extends TelegixError {}
+
+export function createWebhookCallback(
+  bot: Telegix,
+  path?: string,
+  options?: { secretToken?: string }
+): (req: any, res: any, next?: Function) => Promise<void>;
+
+export function createPagesWebhookHandler(
+  botOrFactory?: Telegix | ((env: any, context?: any) => Telegix),
+  options?: {
+    secretToken?: string | ((env: any) => string);
+    path?: string;
+    waitUntil?: boolean;
+    respondOnError?: number;
+    enableHealthCheck?: boolean;
+    onUpdate?: (update: any, context: any) => Promise<void> | void;
+    onError?: (err: Error, context: any) => any;
+  }
+): (context: any, env?: any, ctx?: any) => Promise<Response>;
+
+export function createCloudflareWebhookCallback(
+  botOrFactory?: Telegix | ((env: any, context?: any) => Telegix),
+  options?: object
+): (context: any, env?: any, ctx?: any) => Promise<Response>;
+
+export function handleCloudflareWebhook(
+  context: any,
+  bot: Telegix,
+  options?: object
+): Promise<Response>;
+
+export function createPagesSetWebhookHandler(
+  botOrFactory?: Telegix | ((env: any) => Telegix),
+  options?: { webhookPath?: string; secretToken?: string }
+): (context: any) => Promise<Response>;
 
 export default Telegix;

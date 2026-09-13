@@ -11,7 +11,13 @@ export { Composer, compose } from './lib/composer.js';
 export { Markup, KeyboardBuilder } from './lib/markup.js';
 export { session, MemorySessionStore, FileSessionStore } from './lib/session.js';
 export { Polling } from './lib/polling.js';
-export { createWebhookCallback } from './lib/webhook.js';
+export {
+  createWebhookCallback,
+  createPagesWebhookHandler,
+  createCloudflareWebhookCallback,
+  handleCloudflareWebhook,
+  createPagesSetWebhookHandler,
+} from './lib/webhook.js';
 export { fmt, Format, escapeHtml, escapeMarkdown, html, markdown } from './lib/format.js';
 export { Table, InputRichBlockTable, RichBlockTable } from './lib/table.js';
 export { EphemeralMessageParameters, ReplyParameters, BotCommand } from './lib/ephemeral.js';
